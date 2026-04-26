@@ -1,0 +1,712 @@
+{
+  "app": {
+    "name": "SPADE ARC",
+    "tagline": "Build the physique. Own the arc.",
+    "by": "by Sazyi Rey"
+  },
+  "nav": {
+    "home": "Home",
+    "schedule": "Schedule",
+    "progress": "Progress",
+    "community": "Community",
+    "profile": "Profile"
+  },
+  "onboarding": {
+    "step": "Step {{current}} of {{total}}",
+    "back": "Back",
+    "next": "Next",
+    "skip": "Skip",
+    "getStarted": "Get Started",
+    "alreadyHaveAccount": "Already have an account?",
+    "login": "Log in",
+    "welcome": {
+      "title": "BUILD THE PHYSIQUE.",
+      "subtitle": "OWN THE ARC.",
+      "body": "A 20-week science-based program designed for one thing — building an aesthetic, powerful physique. Created by Sazyi Rey."
+    },
+    "account": {
+      "title": "CREATE YOUR ACCOUNT",
+      "email": "Email address",
+      "password": "Password",
+      "passwordHint": "At least 8 characters",
+      "creating": "Creating account...",
+      "create": "Create account",
+      "terms": "By signing up you agree to our Terms and Privacy Policy.",
+      "trialBadge": "7-day free trial • No card required"
+    },
+    "aboutYou": {
+      "title": "ABOUT YOU",
+      "subtitle": "This shapes your nutrition targets and program intensity.",
+      "name": "Your name",
+      "age": "Age",
+      "sex": "Biological sex",
+      "male": "Male",
+      "female": "Female",
+      "other": "Other",
+      "height": "Height",
+      "weight": "Weight",
+      "units": "Units",
+      "metric": "Metric (kg / cm)",
+      "imperial": "Imperial (lbs / ft)"
+    },
+    "goals": {
+      "title": "YOUR GOALS",
+      "subtitle": "Choose up to 3. Your program will be optimised around these.",
+      "posture": "Taller Posture",
+      "postureDesc": "Stand taller, look more confident",
+      "back": "Wide Back",
+      "backDesc": "Build the V-taper foundation",
+      "sixpack": "Six Pack",
+      "sixpackDesc": "Develop visible ab definition",
+      "waist": "Tiny Waist",
+      "waistDesc": "Narrow and cinched midsection",
+      "arms": "Proportional Arms",
+      "armsDesc": "Balanced bicep and tricep peak",
+      "legs": "Powerful Legs",
+      "legsDesc": "Strong, proportional leg development"
+    },
+    "schedule": {
+      "title": "YOUR SCHEDULE",
+      "subtitle": "How many days per week can you train?",
+      "days": "days / week",
+      "selectDays": "Which days are you available?",
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat",
+      "sun": "Sun"
+    },
+    "gym": {
+      "title": "YOUR GYM",
+      "subtitle": "What equipment do you have access to?",
+      "fullGym": "Full Gym",
+      "fullGymDesc": "Barbells, cables, machines — everything",
+      "dumbbells": "Dumbbells Only",
+      "dumbbellsDesc": "Dumbbell set or commercial gym without cables",
+      "barbellsDumbbells": "Barbells & Dumbbells",
+      "barbellsDumbbellsDesc": "Free weights but no cable machines",
+      "bodyweight": "Bodyweight Only",
+      "bodyweightDesc": "No equipment — home training"
+    },
+    "level": {
+      "title": "YOUR LEVEL",
+      "subtitle": "Be honest — this determines your starting intensity.",
+      "beginner": "Beginner",
+      "beginnerDesc": "0–1 years of consistent training",
+      "intermediate": "Intermediate",
+      "intermediateDesc": "1–3 years of consistent training",
+      "advanced": "Advanced",
+      "advancedDesc": "3+ years of consistent training"
+    },
+    "physicalLife": {
+      "title": "YOUR PHYSICAL LIFE",
+      "subtitle": "This ensures your recovery is properly accounted for.",
+      "physicalJob": "Does your job involve heavy physical labour?",
+      "physicalJobDays": "Which days do you work?",
+      "hasSport": "Do you play a sport or have a regular physical activity?",
+      "sportName": "What is it called?",
+      "sportDays": "Which days do you do it?",
+      "yes": "Yes",
+      "no": "No"
+    },
+    "ready": {
+      "title": "YOUR ARC STARTS NOW",
+      "subtitle": "Here is your program overview.",
+      "phase": "Phase I — Mind & Muscle",
+      "weeks": "20 Weeks",
+      "yourDays": "Your training days",
+      "programBy": "Program by Sazyi Rey",
+      "goToDashboard": "Enter the Arc"
+    }
+  },
+  "auth": {
+    "login": "Log In",
+    "loginTitle": "WELCOME BACK",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "loggingIn": "Logging in...",
+    "noAccount": "Don't have an account?",
+    "signUp": "Sign up",
+    "signOut": "Sign out",
+    "error": {
+      "invalidCredentials": "Invalid email or password.",
+      "emailInUse": "This email is already in use.",
+      "weakPassword": "Password must be at least 8 characters."
+    }
+  },
+  "home": {
+    "greeting": "Good {{timeOfDay}}, {{name}}",
+    "morning": "morning",
+    "afternoon": "afternoon",
+    "evening": "evening",
+    "streak": "Day Streak",
+    "streakUnit": "days",
+    "phase": "Phase {{number}}",
+    "week": "Week {{number}}",
+    "todayWorkout": "Today's Training",
+    "restDay": "Rest Day",
+    "sportDay": "Sport Day",
+    "cardioDay": "Cardio Day",
+    "tapToStart": "Tap to start",
+    "startWorkout": "Start Workout",
+    "decompression": "Morning Decompression",
+    "decompressionComplete": "Done for today",
+    "decompressionStart": "Start routine",
+    "nutrition": "Today's Nutrition",
+    "calories": "Calories",
+    "protein": "Protein",
+    "carbs": "Carbs",
+    "fat": "Fat",
+    "trainingDay": "Training Day",
+    "totalSessions": "Sessions",
+    "totalWeeks": "Weeks",
+    "heaviestLift": "Best Lift",
+    "quote": "Quote of the day"
+  },
+  "workout": {
+    "back": "Back",
+    "exitConfirm": "Save progress and exit?",
+    "exitSave": "Save & Exit",
+    "exitDiscard": "Discard",
+    "exitCancel": "Cancel",
+    "sessionWhy": "Why This Session",
+    "phaseNote": "Phase Focus",
+    "whyThisExercise": "Why this exercise",
+    "substitute": "Substitute",
+    "substituteTitle": "Choose a Substitute",
+    "substituteSelect": "Use this exercise",
+    "key": "KEY",
+    "restSeconds": "{{seconds}}s rest",
+    "set": "Set",
+    "weight": "Weight",
+    "reps": "Reps",
+    "feel": "Feel",
+    "notes": "Notes (optional)",
+    "tickSet": "Complete set",
+    "restTimer": "Rest Timer",
+    "restTimerEdit": "Edit time",
+    "skip": "Skip",
+    "done": "Done",
+    "completeSession": "Complete Session",
+    "setsComplete": "{{done}} / {{total}} sets",
+    "summary": {
+      "title": "SESSION COMPLETE",
+      "duration": "Duration",
+      "totalSets": "Total Sets",
+      "minutes": "min",
+      "bestSet": "Best Set",
+      "sharePR": "Share PR to Community",
+      "backHome": "Back to Dashboard"
+    },
+    "dropset": "Dropset",
+    "timeBased": "seconds"
+  },
+  "schedule": {
+    "title": "THIS WEEK",
+    "phase": "Phase {{number}}",
+    "week": "Week {{number}}",
+    "today": "Today",
+    "workout": "Workout",
+    "rest": "Rest",
+    "sport": "Sport",
+    "cardio": "Cardio",
+    "day6alt": "Arms & Core",
+    "viewWorkout": "View workout",
+    "completed": "Completed",
+    "upcoming": "Upcoming"
+  },
+  "progress": {
+    "title": "PROGRESS",
+    "timeline": "20-Week Timeline",
+    "currentWeek": "Week {{number}}",
+    "measurements": "Body Measurements",
+    "addMeasurement": "Log Measurements",
+    "keyLifts": "Key Lifts",
+    "personalRecords": "Personal Records",
+    "photos": "Progress Photos",
+    "addPhoto": "Add Photo",
+    "noData": "No data yet. Start logging.",
+    "bodyweight": "Bodyweight",
+    "waist": "Waist",
+    "chest": "Chest",
+    "armLeft": "Left Arm",
+    "armRight": "Right Arm",
+    "quadLeft": "Left Quad",
+    "quadRight": "Right Quad",
+    "calfLeft": "Left Calf",
+    "calfRight": "Right Calf",
+    "save": "Save",
+    "prDate": "Set on {{date}}"
+  },
+  "community": {
+    "title": "COMMUNITY",
+    "leaderboard": "Leaderboard",
+    "challenge": "This Week's Challenge",
+    "prFeed": "PR Feed",
+    "rank": "#{{number}}",
+    "sessions": "{{count}} sessions",
+    "winner": "Weekly Champion",
+    "yourRank": "Your Rank",
+    "noShares": "No PRs shared yet this week.",
+    "challengeComplete": "Challenge Complete",
+    "challengeProgress": "{{done}} / {{target}}"
+  },
+  "profile": {
+    "title": "PROFILE",
+    "editProfile": "Edit Profile",
+    "currentWeek": "Current Week",
+    "weekOf20": "Week {{week}} of 20",
+    "equipment": "Equipment",
+    "goals": "Goals",
+    "units": "Units",
+    "language": "Language",
+    "notifications": "Notifications",
+    "subscription": "Subscription",
+    "manageSubscription": "Manage Subscription",
+    "resubscribe": "Resubscribe",
+    "subscriptionActive": "Active — $19.99/month",
+    "subscriptionTrial": "Free Trial",
+    "subscriptionCancelled": "Cancelled",
+    "stats": {
+      "title": "Stats",
+      "totalSessions": "Total Sessions",
+      "currentStreak": "Current Streak",
+      "longestStreak": "Longest Streak",
+      "heaviestSquat": "Heaviest Squat",
+      "heaviestPullUp": "Heaviest Pull-Up",
+      "heaviestRDL": "Heaviest RDL"
+    },
+    "creator": "Program by Sazyi Rey",
+    "signOut": "Sign Out",
+    "save": "Save Changes"
+  },
+  "paywall": {
+    "title": "YOUR TRIAL HAS ENDED",
+    "subtitle": "Continue building the physique.",
+    "price": "$19.99",
+    "period": "/ month",
+    "features": [
+      "Full 20-week physique program",
+      "6 training days with substitutes",
+      "Phase-by-phase progression",
+      "Progress tracking & charts",
+      "Daily protocols & nutrition",
+      "Community & leaderboard"
+    ],
+    "cta": "Start Subscription",
+    "processing": "Processing...",
+    "guarantee": "Cancel anytime. No questions asked.",
+    "cancelled": {
+      "title": "SUBSCRIPTION CANCELLED",
+      "body": "Reactivate to access your program.",
+      "cta": "Resubscribe"
+    }
+  },
+  "cardio": {
+    "liss": {
+      "title": "LISS Incline Walk",
+      "desc": "Treadmill 5–7% incline · 5–6 km/h · 35–45 min · Target HR 120–140bpm"
+    },
+    "hiit": {
+      "title": "HIIT Sprint Intervals",
+      "desc": "8–10 rounds · 30s all-out sprint · 90s walk recovery · 20–25 min total"
+    },
+    "walk": {
+      "title": "Daily Walk",
+      "desc": "30–60 min outdoors · Target 8,000–12,000 steps"
+    },
+    "assault": {
+      "title": "Assault Bike HIIT",
+      "desc": "10 rounds · 20s max effort · 40s easy pedal · Post upper body only"
+    }
+  },
+  "protocol": {
+    "morning": {
+      "title": "Morning Decompression",
+      "cold_shower": { "title": "Cold Shower", "desc": "3–5 min as cold as possible — spikes norepinephrine 300%" },
+      "sunlight": { "title": "Sunlight Outdoors", "desc": "10 min no sunglasses — sets cortisol rhythm for the day" },
+      "dead_hang": { "title": "Dead Hang", "desc": "2 × 45 sec — decompresses spine and adds height over time" },
+      "cat_cow": { "title": "Cat-Cow", "desc": "15 slow reps — mobilises every spinal segment" },
+      "childs_pose": { "title": "Child's Pose", "desc": "45 sec — breathe into lower back to release thoracic tension" },
+      "hip_flexor": { "title": "Hip Flexor Stretch", "desc": "30 sec each side — undoes sitting and physical labour" },
+      "vacuum": { "title": "Vacuum Breathing", "desc": "5 × 20-sec holds on empty stomach — shrinks waist in 4–8 weeks" },
+      "breakfast": { "title": "High Protein Breakfast", "desc": "40–50g within 60 min of waking — stops overnight muscle breakdown" }
+    },
+    "night": {
+      "title": "Night Protocol",
+      "dead_hang": { "title": "Dead Hang", "desc": "2 × 45 sec — undo the day's gravity compression on the spine" },
+      "cat_cow": { "title": "Cat-Cow", "desc": "15 reps — release accumulated spinal tension" },
+      "childs_pose": { "title": "Child's Pose", "desc": "45 sec — thoracic and lumbar release" },
+      "hip_flexor": { "title": "Hip Flexor Stretch", "desc": "30 sec each side" },
+      "magnesium": { "title": "Magnesium Glycinate", "desc": "400mg — improves deep sleep and testosterone by 17%" },
+      "temperature": { "title": "Room Temperature", "desc": "18–20°C / 64–68°F — optimal for growth hormone release during sleep" },
+      "no_screens": { "title": "No Screens", "desc": "60 min before bed — blue light delays deep sleep by 90 min" },
+      "casein": { "title": "Casein / Greek Yogurt", "desc": "Slow-release protein overnight for muscle protein synthesis" }
+    }
+  },
+  "supplements": {
+    "creatine": { "title": "Creatine Monohydrate", "desc": "5g daily — increases strength and muscle volume" },
+    "whey": { "title": "Whey Protein", "desc": "To hit your daily protein target" },
+    "vitamin_d": { "title": "Vitamin D3 + K2", "desc": "Daily — supports testosterone and bone density" },
+    "magnesium": { "title": "Magnesium Glycinate", "desc": "400mg nightly — deep sleep and recovery" },
+    "omega3": { "title": "Omega-3", "desc": "2–3g daily — reduces inflammation and supports joints" }
+  },
+  "workouts": {
+    "day1": {
+      "name": "Back Width",
+      "sessionWhy": "The back is the foundation of the V-taper. Wide lats make the waist look tiny. This session builds width, corrects forward posture, and creates the silhouette that makes everything else look better.",
+      "phaseNote": "Feel every rep. Build the mind-muscle connection with your lats before loading heavy. The stretch at the bottom of every pull is where the growth happens.",
+      "ex1": {
+        "name": "Weighted Pull-Up",
+        "muscle": "Lats",
+        "why": "Number 1 lat width exercise. Dead hang at bottom fully stretches the lat. Stretched position is where hypertrophy signalling is highest. Cannot be replicated on a machine.",
+        "sub1": { "name": "Lat Pulldown", "exp": "Same movement pattern on a machine — great if pull-ups are too difficult." },
+        "sub2": { "name": "Assisted Pull-Up", "exp": "Use the assisted machine to build toward full pull-ups." },
+        "sub3": { "name": "Cable Pullover", "exp": "Isolates the lat in the stretched position." }
+      },
+      "ex2": {
+        "name": "Cable Straight-Arm Pulldown",
+        "muscle": "Lats",
+        "why": "Isolates the lat without bicep involvement. Teaches your brain to feel the lat working which is critical for mind-muscle connection in Phase I.",
+        "sub1": { "name": "DB Pullover", "exp": "Lie on bench, arc the dumbbell behind your head to stretch the lat." },
+        "sub2": { "name": "Band Pulldown", "exp": "Same movement with a resistance band." },
+        "sub3": { "name": "Straight-Arm Cable Pushdown", "exp": "Cable version from a high pulley." }
+      },
+      "ex3": {
+        "name": "Chest-Supported T-Bar Row",
+        "muscle": "Mid Back",
+        "why": "Chest support removes the lower back from the equation so the mid-back does all the work. Builds the 3D thickness that makes your back look like a wall from behind.",
+        "sub1": { "name": "Seated Cable Row", "exp": "Sit at a cable station, pull to your lower chest with elbows flared 45 degrees." },
+        "sub2": { "name": "Chest-Supported DB Row", "exp": "Lie chest-down on an incline bench holding dumbbells." },
+        "sub3": { "name": "Machine Row", "exp": "Any chest-supported row machine." }
+      },
+      "ex4": {
+        "name": "Face Pulls",
+        "muscle": "Rear Delts / Traps",
+        "why": "Directly counters forward shoulder posture. Strengthens rear delts and mid traps which are the two muscles most responsible for standing tall and looking confident.",
+        "sub1": { "name": "Band Pull-Apart", "exp": "Pull a resistance band apart at chest height keeping arms straight." },
+        "sub2": { "name": "Reverse Fly Machine", "exp": "Sit facing the machine and fly the pads apart." },
+        "sub3": { "name": "Cable Reverse Fly", "exp": "Cables crossed, pull apart with straight arms." }
+      },
+      "ex5": {
+        "name": "Single-Arm Cable Row",
+        "muscle": "Lats / Mid Back",
+        "why": "Unilateral work fixes left-right imbalances. One side is always stronger from daily life and this equalises both sides for symmetrical width.",
+        "sub1": { "name": "Single-Arm DB Row", "exp": "One knee and hand on bench, row the dumbbell to your hip." },
+        "sub2": { "name": "Single-Arm Band Row", "exp": "Anchor a band and row with one arm." },
+        "sub3": { "name": "Single-Arm Machine Row", "exp": "Use one arm at a time on any row machine." }
+      },
+      "ex6": {
+        "name": "Cable Rear Delt Row (Wide Grip)",
+        "muscle": "Rear Delts",
+        "why": "Second rear delt movement of the session. You can never do too much rear delt work. Protects the shoulder joint long term and continues building posture.",
+        "sub1": { "name": "Reverse Pec Deck", "exp": "Sit facing the pec deck machine and reverse the motion." },
+        "sub2": { "name": "DB Rear Delt Fly", "exp": "Hinge forward 45 degrees and fly dumbbells out to the sides." },
+        "sub3": { "name": "Band Reverse Fly", "exp": "Same motion with a resistance band." }
+      }
+    },
+    "day2": {
+      "name": "Legs — Quads",
+      "sessionWhy": "Quads are your biggest muscle group so they need the most volume and the most food. Today is quad-dominant. Two dedicated leg days per week is the scientifically proven fastest way to build powerful legs.",
+      "phaseNote": "Full depth on every squat. Full range of motion builds significantly more muscle than partial reps at heavier weight. Leave your ego at the door this phase.",
+      "ex1": {
+        "name": "Barbell Back Squat",
+        "muscle": "Quads / Glutes",
+        "why": "The king of all exercises. Releases more testosterone and growth hormone than any other movement. High bar and upright torso keeps the load on the quads rather than the lower back.",
+        "sub1": { "name": "Goblet Squat", "exp": "Hold a dumbbell at your chest and squat — great for beginners to learn the pattern." },
+        "sub2": { "name": "Smith Machine Squat", "exp": "The fixed bar helps you focus on depth and form." },
+        "sub3": { "name": "Leg Press", "exp": "Sit in the leg press and push the platform away — feet low and narrow for quad focus." }
+      },
+      "ex2": {
+        "name": "Leg Press (Feet Low & Narrow)",
+        "muscle": "Quads",
+        "why": "Feet low and narrow on the platform shifts all the stress onto the quads. Perfect substitute for hack squat and allows heavier loading than split squats for raw mass.",
+        "sub1": { "name": "Hack Squat Machine", "exp": "If available this is the best option — same foot position." },
+        "sub2": { "name": "V-Squat Machine", "exp": "Similar to hack squat, great for quad isolation." },
+        "sub3": { "name": "Smith Machine Squat (Feet Forward)", "exp": "Place feet slightly in front and let the bar track to load quads." }
+      },
+      "ex3": {
+        "name": "Bulgarian Split Squat",
+        "muscle": "Quads / Glutes",
+        "why": "Research confirms unilateral training builds more muscle per leg than bilateral squatting alone. Also fixes the imbalances most people develop from daily movement patterns.",
+        "sub1": { "name": "Reverse Lunge", "exp": "Step back into a lunge keeping torso upright for quad focus." },
+        "sub2": { "name": "Step-Up with Weight", "exp": "Step onto a bench holding dumbbells." },
+        "sub3": { "name": "Single-Leg Leg Press", "exp": "One leg at a time on the leg press." }
+      },
+      "ex4": {
+        "name": "Leg Extension (Slow Eccentric)",
+        "muscle": "Quads",
+        "why": "3-second lowering maximises time under tension at the stretched position. Builds the quad sweep visible from the front and the separation between the quad heads.",
+        "sub1": { "name": "Sissy Squat", "exp": "Lean back and let your knees travel far forward — intense quad isolation." },
+        "sub2": { "name": "Cyclist Squat", "exp": "Heels elevated on plates, narrow stance squat — quad dominant." },
+        "sub3": { "name": "Wall Sit with Weight", "exp": "Hold a plate on your thighs for added resistance." }
+      },
+      "ex5": {
+        "name": "Standing Calf Raise",
+        "muscle": "Gastrocnemius",
+        "why": "Full stretch at the bottom is the only way to actually grow calves. Most people do partial reps which only maintains them. Hang your heel off the edge for maximum stretch.",
+        "sub1": { "name": "Seated Calf Raise", "exp": "Targets the soleus underneath — do both standing and seated for complete calves." },
+        "sub2": { "name": "Leg Press Calf Raise", "exp": "Push the platform away with just your toes." },
+        "sub3": { "name": "Smith Machine Calf Raise", "exp": "Stand on a plate under the smith bar." }
+      },
+      "ex6": {
+        "name": "Ab Wheel Rollout",
+        "muscle": "Core",
+        "why": "Trains your core to resist extension which is the exact demand when carrying heavy loads. Builds the deep ab strength that protects the lower back and also creates core density.",
+        "sub1": { "name": "Cable Crunch", "exp": "Kneel at a high cable and crunch your ribs to your hips." },
+        "sub2": { "name": "Plank with Weight", "exp": "Standard plank with a plate on your back." },
+        "sub3": { "name": "Dead Bug", "exp": "Lie on your back and alternate extending opposite arm and leg." }
+      }
+    },
+    "day3": {
+      "name": "Chest & Arms",
+      "sessionWhy": "Upper chest gives the illusion of a bigger fuller physique even with a shirt on. Arms are trained here so they get direct work without overlapping with back day. Zero heavy oblique work ever in this program — it widens the waist permanently.",
+      "phaseNote": "Superset the arm exercises at the end to save time and create a massive pump that accelerates growth. Focus on the stretch at the bottom of every pressing movement.",
+      "ex1": {
+        "name": "Incline Barbell Press",
+        "muscle": "Upper Chest",
+        "why": "Upper chest is the most underdeveloped area in most lifters. A full upper chest creates the shelf look and makes the chest visible when standing upright. 30–45 degree incline is the scientifically proven sweet spot for upper pec activation.",
+        "sub1": { "name": "Incline DB Press", "exp": "Dumbbells allow a greater range of motion and fix left-right imbalances." },
+        "sub2": { "name": "Incline Smith Machine Press", "exp": "The fixed bar removes balance demands so you can focus purely on the chest." },
+        "sub3": { "name": "Cable Upper Chest Fly", "exp": "Cables from low to high hitting upper chest with constant tension." }
+      },
+      "ex2": {
+        "name": "Incline DB Fly",
+        "muscle": "Upper Chest",
+        "why": "The wide arc creates maximum stretch on the pec fibres. Stretched position training triggers satellite cell activation which is the mechanism behind actual muscle fibre growth not just swelling.",
+        "sub1": { "name": "Cable Fly High to Low", "exp": "Cables set high, fly down and across — constant tension throughout." },
+        "sub2": { "name": "Pec Deck at Incline", "exp": "If the machine adjusts to incline, use it for the same stretch." },
+        "sub3": { "name": "Resistance Band Fly", "exp": "Anchor bands behind you and fly your arms together." }
+      },
+      "ex3": {
+        "name": "Cable Crossover (High to Low)",
+        "muscle": "Lower Chest",
+        "why": "Cable provides constant tension throughout the entire movement which dumbbells cannot. Builds the lower chest separation line visible when you take your shirt off.",
+        "sub1": { "name": "DB Fly Flat", "exp": "Lie flat and fly dumbbells in a wide arc." },
+        "sub2": { "name": "Pec Deck Machine", "exp": "Sit and squeeze the pads together — great constant tension." },
+        "sub3": { "name": "Push-Up with Weight", "exp": "Elevate feet and place weight on back for added resistance." }
+      },
+      "ex4": {
+        "name": "Close-Grip Bench Press",
+        "muscle": "Triceps",
+        "why": "Triceps make up two thirds of your upper arm. Close grip bench allows the heaviest loading of any tricep exercise — more weight equals more mechanical tension equals more growth.",
+        "sub1": { "name": "Weighted Dips", "exp": "Lean slightly forward and dip with weight between legs or on a belt." },
+        "sub2": { "name": "DB Tricep Press (Close Grip)", "exp": "Dumbbells touching together on a flat bench." },
+        "sub3": { "name": "Smith Machine Close Grip", "exp": "Fixed bar helps keep elbows tucked." }
+      },
+      "ex5": {
+        "name": "Overhead Cable Tricep Extension",
+        "muscle": "Triceps (Long Head)",
+        "why": "The only movement that fully stretches the tricep long head. The long head is the biggest of the three heads and gives the horseshoe shape when developed. Must be trained in the stretched position.",
+        "sub1": { "name": "Overhead DB Tricep Extension", "exp": "Hold one dumbbell with both hands behind your head." },
+        "sub2": { "name": "EZ-Bar Overhead Extension", "exp": "Same movement with a barbell — more stable." },
+        "sub3": { "name": "Band Overhead Extension", "exp": "Anchor a band at your feet and extend overhead." }
+      },
+      "ex6": {
+        "name": "Incline DB Curl",
+        "muscle": "Biceps (Long Head)",
+        "why": "Arm positioned behind the body on the incline bench creates a full stretch on the long head of the bicep. The long head is what creates the peak when you flex. Flat curls completely miss this stretch.",
+        "sub1": { "name": "Cable Curl from Low Pulley", "exp": "Stand at a cable machine and curl — constant tension throughout." },
+        "sub2": { "name": "Spider Curl", "exp": "Lie chest-down on an incline bench and curl — removes all cheating." },
+        "sub3": { "name": "Band Curl Seated", "exp": "Sit on a bench with band under your feet." }
+      },
+      "ex7": {
+        "name": "Hammer Curl",
+        "muscle": "Brachialis",
+        "why": "Neutral grip trains the brachialis which is the muscle underneath the bicep. When the brachialis develops it physically pushes the bicep upward making your arms look significantly thicker from every angle.",
+        "sub1": { "name": "Rope Hammer Curl", "exp": "Use the rope attachment on a low cable." },
+        "sub2": { "name": "Cross-Body Hammer Curl", "exp": "Curl across your body to emphasise the brachialis." },
+        "sub3": { "name": "Reverse Curl", "exp": "Overhand grip on a barbell or cables to hit brachialis and forearms." }
+      }
+    },
+    "day4": {
+      "name": "Legs — Hamstrings",
+      "sessionWhy": "Posterior chain day. Weak glutes cause anterior pelvic tilt which makes the stomach stick out even when lean. Build this posterior chain and you stand taller and look leaner automatically without changing anything else.",
+      "phaseNote": "The RDL is the most important exercise of the day. Spend extra time feeling the hamstring stretch at the bottom. That stretched position is exactly where the muscle grows.",
+      "ex1": {
+        "name": "Romanian Deadlift",
+        "muscle": "Hamstrings",
+        "why": "The best hamstring exercise in existence. The deep stretch at the bottom fully loads the hamstrings in their lengthened position. Science confirms stretched-position training builds significantly more muscle than contracted-position training.",
+        "sub1": { "name": "Dumbbell RDL", "exp": "Same movement with dumbbells — great if you are learning the hinge pattern." },
+        "sub2": { "name": "Single-Leg RDL", "exp": "One leg at a time for maximum hamstring stretch and balance challenge." },
+        "sub3": { "name": "Cable Pull-Through", "exp": "Stand facing away from a low cable and hinge forward." }
+      },
+      "ex2": {
+        "name": "Leg Curl Unilateral (Lying)",
+        "muscle": "Hamstrings",
+        "why": "Forces each leg to work independently. Most people have a significantly weaker hamstring on one side from daily movement patterns. This identifies and fixes the imbalance before it becomes an injury.",
+        "sub1": { "name": "Nordic Curl", "exp": "Kneel on a pad with feet anchored and lower your body forward — brutally effective." },
+        "sub2": { "name": "Swiss Ball Leg Curl", "exp": "Lie on your back with heels on a ball and curl it toward you." },
+        "sub3": { "name": "Resistance Band Leg Curl", "exp": "Anchor band at ankle height and curl." }
+      },
+      "ex3": {
+        "name": "Barbell Hip Thrust",
+        "muscle": "Glutes",
+        "why": "EMG research confirms hip thrusts produce higher glute activation than any other exercise including squats. Strong glutes mean upright posture, no lower back pain, and powerful athletic movement.",
+        "sub1": { "name": "DB Hip Thrust", "exp": "Same movement with dumbbells on your hips." },
+        "sub2": { "name": "Single-Leg Hip Thrust", "exp": "One leg at a time — doubles the intensity and fixes imbalances." },
+        "sub3": { "name": "Cable Pull-Through", "exp": "Face away from cable and hinge to squeeze glutes at the top." }
+      },
+      "ex4": {
+        "name": "Good Morning",
+        "muscle": "Spinal Erectors",
+        "why": "Builds the spinal erectors which are the muscles running alongside your spine. Directly translates to better posture and protects the lower back during any heavy physical activity.",
+        "sub1": { "name": "Back Extension", "exp": "Lie face down on a hyperextension bench and extend your body up." },
+        "sub2": { "name": "Cable Pull-Through", "exp": "Same hip hinge pattern with a cable for constant tension." },
+        "sub3": { "name": "Dumbbell Good Morning", "exp": "Hold dumbbells at shoulders instead of a barbell." }
+      },
+      "ex5": {
+        "name": "Seated Calf Raise",
+        "muscle": "Soleus",
+        "why": "The bent knee position deactivates the gastrocnemius and isolates the soleus which sits underneath. You need both heads of the calf trained for complete calf development visible from every angle.",
+        "sub1": { "name": "Leg Press Calf Raise (Seated)", "exp": "Sit in the leg press with knees bent and press with toes only." },
+        "sub2": { "name": "Resistance Band Seated Calf Raise", "exp": "Sit on a bench with band looped over your knees and press down." }
+      },
+      "ex6": {
+        "name": "Hanging Leg Raise",
+        "muscle": "Lower Abs",
+        "why": "Posterior pelvic tilt at the top is what makes this effective — without it you are just swinging your hip flexors. Lower abs are the last part of the six pack to appear and the hardest to develop.",
+        "sub1": { "name": "Captain Chair Leg Raise", "exp": "Same movement on a captain chair machine." },
+        "sub2": { "name": "Reverse Crunch with Weight", "exp": "Lie on a bench and crunch your hips up toward the ceiling." },
+        "sub3": { "name": "Cable Crunch from Low Pulley", "exp": "Pull the cable toward your hips while lying down." }
+      }
+    },
+    "day5": {
+      "name": "Shoulders & Back Thickness",
+      "sessionWhy": "Wide shoulders complete the V-taper. Combined with back thickness today your upper body will look wide and powerful from every angle. This is the session that makes the physique look complete.",
+      "phaseNote": "Lateral raises are the single most important exercise for shoulder width. Never go heavy enough that you swing. Slow and controlled with a slight lean away is what actually builds the side delt.",
+      "ex1": {
+        "name": "Seated DB Overhead Press",
+        "muscle": "Shoulders",
+        "why": "Seated position removes the ability to use leg drive so it is pure shoulder work. Dumbbells allow a natural arc that protects the rotator cuff compared to a fixed barbell path.",
+        "sub1": { "name": "Barbell Overhead Press", "exp": "Standing or seated with a barbell — allows heavier loading." },
+        "sub2": { "name": "Smith Machine OHP", "exp": "Fixed bar path helps beginners learn the pressing motion." },
+        "sub3": { "name": "Cable Overhead Press", "exp": "Cables from the sides pressing up — constant tension." }
+      },
+      "ex2": {
+        "name": "Cable Lateral Raise (Unilateral)",
+        "muscle": "Side Delts",
+        "why": "Cable provides constant tension throughout the entire movement while dumbbells have zero tension at the bottom. The side delt is the muscle that creates visible shoulder width and this is the single most important exercise for looking broader.",
+        "sub1": { "name": "DB Lateral Raise", "exp": "The classic — slight lean away and slight bend in elbow." },
+        "sub2": { "name": "Machine Lateral Raise", "exp": "Great for beginners — removes the stability challenge." },
+        "sub3": { "name": "Band Lateral Raise", "exp": "Anchor band under your foot and raise to the side." }
+      },
+      "ex3": {
+        "name": "Seated Cable Row (Wide Grip)",
+        "muscle": "Mid Traps / Rhomboids",
+        "why": "Wide grip and elbows flared 45 degrees hits the mid-traps and rhomboids specifically — the muscles that hold your shoulders back and create back thickness from behind.",
+        "sub1": { "name": "Barbell Row Overhand", "exp": "Hinge forward and pull bar to lower chest." },
+        "sub2": { "name": "T-Bar Row", "exp": "Chest on the pad and pull the bar to your sternum." },
+        "sub3": { "name": "DB Row", "exp": "One knee on bench, pull dumbbell to your hip." }
+      },
+      "ex4": {
+        "name": "Single-Arm DB Row (High Elbow)",
+        "muscle": "Upper Lats / Teres Major",
+        "why": "High elbow pulling toward the hip rather than straight up hits the upper lat and teres major — the muscles that create the width right under your armpit. Most rows miss this area completely.",
+        "sub1": { "name": "Meadows Row", "exp": "Load one end of a barbell and row it with high elbow — same angle." },
+        "sub2": { "name": "High Cable Row Single Arm", "exp": "Set cable at shoulder height and pull across your body." },
+        "sub3": { "name": "Machine Row Single Arm", "exp": "Use one arm at a time on any row machine." }
+      },
+      "ex5": {
+        "name": "Rear Delt Cable Fly",
+        "muscle": "Rear Delts",
+        "why": "This is the third rear delt movement across the week and you need this volume to undo forward posture that builds up over months and years of daily life. Rear delts recover fast and respond to high frequency.",
+        "sub1": { "name": "Reverse Pec Deck", "exp": "Sit facing the machine and reverse the pec deck motion." },
+        "sub2": { "name": "DB Rear Delt Fly", "exp": "Hinge forward 45 degrees and fly dumbbells straight out to the sides." },
+        "sub3": { "name": "Band Reverse Fly", "exp": "Same hinge position with a resistance band." }
+      },
+      "ex6": {
+        "name": "DB Shrug",
+        "muscle": "Upper Traps",
+        "why": "Well developed upper traps make the physique look powerful and athletic from the front and back. Hold the peak contraction for one full second — the contracted position is where the growth stimulus is highest.",
+        "sub1": { "name": "Barbell Shrug", "exp": "Allows heavier loading than dumbbells." },
+        "sub2": { "name": "Cable Shrug", "exp": "Constant tension throughout the movement." },
+        "sub3": { "name": "Smith Machine Shrug", "exp": "Fixed bar helps you focus on the contraction rather than balance." }
+      },
+      "ex7": {
+        "name": "Weighted Plank",
+        "muscle": "Core / TVA",
+        "why": "Trains the transverse abdominis which is your natural weight belt. When this muscle is strong it physically cinches the waist inward. Combined with daily vacuum breathing it is the primary driver of the tiny waist goal.",
+        "sub1": { "name": "Ab Wheel", "exp": "Roll out slowly and back in — trains the same anti-extension pattern." },
+        "sub2": { "name": "Dead Bug", "exp": "Lie on back and alternate extending opposite arm and leg while keeping lower back flat." },
+        "sub3": { "name": "Hollow Body Hold", "exp": "Press lower back into the floor and hold legs and arms extended." }
+      }
+    },
+    "day6": {
+      "name": "Arms & Core",
+      "sessionWhy": "Extra arm volume every two weeks gives biceps and triceps a dedicated session on top of the work they already get in chest day. Arms respond fastest to frequency. Core work here focuses on building actual muscle density and the TVA vacuum protocol.",
+      "phaseNote": "Keep this under 60 minutes. This is a bonus session — quality and feel over weight and ego.",
+      "ex1": {
+        "name": "EZ-Bar Preacher Curl",
+        "muscle": "Biceps",
+        "why": "The preacher bench locks the upper arm in place completely removing any momentum or cheating. This forces the bicep to do 100% of the work through the full range of motion.",
+        "sub1": { "name": "Machine Preacher Curl", "exp": "Same locked position on a machine — great for beginners." },
+        "sub2": { "name": "Cable Preacher Curl", "exp": "Use a low cable at a preacher bench for constant tension." },
+        "sub3": { "name": "DB Preacher Curl", "exp": "Same locked position with a dumbbell for unilateral work." }
+      },
+      "ex2": {
+        "name": "Cable Curl (Supinated)",
+        "muscle": "Biceps",
+        "why": "Supinating the wrist fully at the top of the movement maximises the peak contraction of the bicep. Holding that squeeze for one second at the top creates the maximum growth stimulus at the contracted position.",
+        "sub1": { "name": "DB Curl", "exp": "Standard dumbbell curl with full supination at the top." },
+        "sub2": { "name": "Barbell Curl", "exp": "Allows heavier loading — great for overall bicep mass." },
+        "sub3": { "name": "Band Curl", "exp": "Anchor band under foot and curl — constant tension." }
+      },
+      "ex3": {
+        "name": "Skull Crusher (EZ-Bar)",
+        "muscle": "Triceps (Long Head)",
+        "why": "Loads the tricep long head in its fully stretched position which is where it responds best to growth stimulus. The long head makes up the majority of tricep size and gives the horseshoe shape.",
+        "sub1": { "name": "DB Skull Crusher", "exp": "Same movement with dumbbells — allows arms to travel further back for more stretch." },
+        "sub2": { "name": "Cable Overhead Extension", "exp": "Stand facing away from cable and extend overhead." },
+        "sub3": { "name": "Dip", "exp": "Lean forward slightly to emphasise the long head." }
+      },
+      "ex4": {
+        "name": "Cable Pushdown (Rope)",
+        "muscle": "Triceps (Lateral Head)",
+        "why": "Spreading the rope apart at the very bottom of each rep creates maximum lateral head contraction. The lateral head is what creates the horseshoe shape visible from the side when the arm is relaxed.",
+        "sub1": { "name": "V-Bar Pushdown", "exp": "Narrow grip emphasises the lateral head." },
+        "sub2": { "name": "DB Kickback", "exp": "Hinge forward and extend the arm straight back." },
+        "sub3": { "name": "Band Pushdown", "exp": "Anchor band overhead and push down." }
+      },
+      "ex5": {
+        "name": "Cable Crunch (Kneeling)",
+        "muscle": "Abs",
+        "why": "Weighted ab work builds actual ab muscle density. You cannot have impressive abs without first building the muscle under the fat. Training builds the muscle and diet reveals it.",
+        "sub1": { "name": "Decline Weighted Crunch", "exp": "Lie on a decline bench holding a plate on your chest." },
+        "sub2": { "name": "Machine Crunch", "exp": "Sit in an ab machine and crunch — great for beginners." },
+        "sub3": { "name": "Ab Roller", "exp": "Roll out and back — similar to cable crunch but bodyweight." }
+      },
+      "ex6": {
+        "name": "Hanging Leg Raise",
+        "muscle": "Lower Abs",
+        "why": "Lower abs are the last section of the six pack to appear and the hardest to actually develop. Posterior pelvic tilt at the top is essential — without this cue you are training hip flexors only.",
+        "sub1": { "name": "Captain Chair Raise", "exp": "Same movement on a captain chair machine for beginners." },
+        "sub2": { "name": "Reverse Crunch", "exp": "Lie on a bench and crunch the hips up — bodyweight version." },
+        "sub3": { "name": "Cable Crunch Low Pulley", "exp": "Pull the cable toward hips while lying on the floor." }
+      }
+    }
+  },
+  "errors": {
+    "general": "Something went wrong. Please try again.",
+    "network": "No connection. Check your internet.",
+    "auth": "Authentication error. Please log in again."
+  },
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "kg": "kg",
+    "lbs": "lbs",
+    "cm": "cm",
+    "ft": "ft",
+    "min": "min",
+    "sec": "sec"
+  }
+}

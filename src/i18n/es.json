@@ -1,0 +1,712 @@
+{
+  "app": {
+    "name": "SPADE ARC",
+    "tagline": "Construye el físico. Domina el arco.",
+    "by": "por Sazyi Rey"
+  },
+  "nav": {
+    "home": "Inicio",
+    "schedule": "Horario",
+    "progress": "Progreso",
+    "community": "Comunidad",
+    "profile": "Perfil"
+  },
+  "onboarding": {
+    "step": "Paso {{current}} de {{total}}",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "skip": "Omitir",
+    "getStarted": "Comenzar",
+    "alreadyHaveAccount": "¿Ya tienes cuenta?",
+    "login": "Iniciar sesión",
+    "welcome": {
+      "title": "CONSTRUYE EL FÍSICO.",
+      "subtitle": "DOMINA EL ARCO.",
+      "body": "Un programa de 20 semanas basado en ciencia diseñado para una cosa — construir un físico estético y poderoso. Creado por Sazyi Rey."
+    },
+    "account": {
+      "title": "CREA TU CUENTA",
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "passwordHint": "Al menos 8 caracteres",
+      "creating": "Creando cuenta...",
+      "create": "Crear cuenta",
+      "terms": "Al registrarte aceptas nuestros Términos y Política de Privacidad.",
+      "trialBadge": "7 días de prueba gratis • Sin tarjeta requerida"
+    },
+    "aboutYou": {
+      "title": "SOBRE TI",
+      "subtitle": "Esto define tus objetivos nutricionales e intensidad del programa.",
+      "name": "Tu nombre",
+      "age": "Edad",
+      "sex": "Sexo biológico",
+      "male": "Masculino",
+      "female": "Femenino",
+      "other": "Otro",
+      "height": "Altura",
+      "weight": "Peso",
+      "units": "Unidades",
+      "metric": "Métrico (kg / cm)",
+      "imperial": "Imperial (lbs / ft)"
+    },
+    "goals": {
+      "title": "TUS OBJETIVOS",
+      "subtitle": "Elige hasta 3. Tu programa se optimizará en torno a estos.",
+      "posture": "Mejor Postura",
+      "postureDesc": "Pararte más alto, verte más seguro",
+      "back": "Espalda Ancha",
+      "backDesc": "Construir la base del físico en V",
+      "sixpack": "Abdominales",
+      "sixpackDesc": "Desarrollar definición abdominal visible",
+      "waist": "Cintura Pequeña",
+      "waistDesc": "Sección media estrecha y marcada",
+      "arms": "Brazos Proporcionados",
+      "armsDesc": "Pico de bícep y trícep equilibrado",
+      "legs": "Piernas Poderosas",
+      "legsDesc": "Desarrollo de piernas fuerte y proporcional"
+    },
+    "schedule": {
+      "title": "TU HORARIO",
+      "subtitle": "¿Cuántos días por semana puedes entrenar?",
+      "days": "días / semana",
+      "selectDays": "¿Qué días estás disponible?",
+      "mon": "Lun",
+      "tue": "Mar",
+      "wed": "Mié",
+      "thu": "Jue",
+      "fri": "Vie",
+      "sat": "Sáb",
+      "sun": "Dom"
+    },
+    "gym": {
+      "title": "TU GIMNASIO",
+      "subtitle": "¿A qué equipamiento tienes acceso?",
+      "fullGym": "Gimnasio Completo",
+      "fullGymDesc": "Barras, cables, máquinas — todo",
+      "dumbbells": "Solo Mancuernas",
+      "dumbbellsDesc": "Juego de mancuernas sin cables",
+      "barbellsDumbbells": "Barras y Mancuernas",
+      "barbellsDumbbellsDesc": "Peso libre pero sin máquinas de cable",
+      "bodyweight": "Solo Peso Corporal",
+      "bodyweightDesc": "Sin equipamiento — entrenamiento en casa"
+    },
+    "level": {
+      "title": "TU NIVEL",
+      "subtitle": "Sé honesto — esto determina tu intensidad inicial.",
+      "beginner": "Principiante",
+      "beginnerDesc": "0–1 años de entrenamiento constante",
+      "intermediate": "Intermedio",
+      "intermediateDesc": "1–3 años de entrenamiento constante",
+      "advanced": "Avanzado",
+      "advancedDesc": "3+ años de entrenamiento constante"
+    },
+    "physicalLife": {
+      "title": "TU VIDA FÍSICA",
+      "subtitle": "Esto asegura que tu recuperación sea correctamente considerada.",
+      "physicalJob": "¿Tu trabajo implica trabajo físico pesado?",
+      "physicalJobDays": "¿Qué días trabajas?",
+      "hasSport": "¿Practicas un deporte o tienes una actividad física regular?",
+      "sportName": "¿Cómo se llama?",
+      "sportDays": "¿Qué días lo haces?",
+      "yes": "Sí",
+      "no": "No"
+    },
+    "ready": {
+      "title": "TU ARCO COMIENZA AHORA",
+      "subtitle": "Aquí está el resumen de tu programa.",
+      "phase": "Fase I — Mente y Músculo",
+      "weeks": "20 Semanas",
+      "yourDays": "Tus días de entrenamiento",
+      "programBy": "Programa por Sazyi Rey",
+      "goToDashboard": "Entrar al Arco"
+    }
+  },
+  "auth": {
+    "login": "Iniciar Sesión",
+    "loginTitle": "BIENVENIDO DE VUELTA",
+    "email": "Correo",
+    "password": "Contraseña",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "loggingIn": "Iniciando sesión...",
+    "noAccount": "¿No tienes cuenta?",
+    "signUp": "Regístrate",
+    "signOut": "Cerrar sesión",
+    "error": {
+      "invalidCredentials": "Correo o contraseña incorrectos.",
+      "emailInUse": "Este correo ya está en uso.",
+      "weakPassword": "La contraseña debe tener al menos 8 caracteres."
+    }
+  },
+  "home": {
+    "greeting": "Buenos {{timeOfDay}}, {{name}}",
+    "morning": "días",
+    "afternoon": "tardes",
+    "evening": "noches",
+    "streak": "Racha de Días",
+    "streakUnit": "días",
+    "phase": "Fase {{number}}",
+    "week": "Semana {{number}}",
+    "todayWorkout": "Entrenamiento de Hoy",
+    "restDay": "Día de Descanso",
+    "sportDay": "Día de Deporte",
+    "cardioDay": "Día de Cardio",
+    "tapToStart": "Toca para empezar",
+    "startWorkout": "Comenzar Entrenamiento",
+    "decompression": "Descompresión Matutina",
+    "decompressionComplete": "Completado hoy",
+    "decompressionStart": "Iniciar rutina",
+    "nutrition": "Nutrición de Hoy",
+    "calories": "Calorías",
+    "protein": "Proteína",
+    "carbs": "Carbohidratos",
+    "fat": "Grasas",
+    "trainingDay": "Día de Entrenamiento",
+    "totalSessions": "Sesiones",
+    "totalWeeks": "Semanas",
+    "heaviestLift": "Mejor Levantamiento",
+    "quote": "Cita del día"
+  },
+  "workout": {
+    "back": "Atrás",
+    "exitConfirm": "¿Guardar progreso y salir?",
+    "exitSave": "Guardar y Salir",
+    "exitDiscard": "Descartar",
+    "exitCancel": "Cancelar",
+    "sessionWhy": "Por Qué Esta Sesión",
+    "phaseNote": "Enfoque de la Fase",
+    "whyThisExercise": "Por qué este ejercicio",
+    "substitute": "Sustituir",
+    "substituteTitle": "Elige un Sustituto",
+    "substituteSelect": "Usar este ejercicio",
+    "key": "CLAVE",
+    "restSeconds": "{{seconds}}s descanso",
+    "set": "Serie",
+    "weight": "Peso",
+    "reps": "Reps",
+    "feel": "Sensación",
+    "notes": "Notas (opcional)",
+    "tickSet": "Completar serie",
+    "restTimer": "Temporizador",
+    "restTimerEdit": "Editar tiempo",
+    "skip": "Omitir",
+    "done": "Listo",
+    "completeSession": "Completar Sesión",
+    "setsComplete": "{{done}} / {{total}} series",
+    "summary": {
+      "title": "SESIÓN COMPLETADA",
+      "duration": "Duración",
+      "totalSets": "Series Totales",
+      "minutes": "min",
+      "bestSet": "Mejor Serie",
+      "sharePR": "Compartir PR en Comunidad",
+      "backHome": "Volver al Inicio"
+    },
+    "dropset": "Dropset",
+    "timeBased": "segundos"
+  },
+  "schedule": {
+    "title": "ESTA SEMANA",
+    "phase": "Fase {{number}}",
+    "week": "Semana {{number}}",
+    "today": "Hoy",
+    "workout": "Entrenamiento",
+    "rest": "Descanso",
+    "sport": "Deporte",
+    "cardio": "Cardio",
+    "day6alt": "Brazos y Core",
+    "viewWorkout": "Ver entrenamiento",
+    "completed": "Completado",
+    "upcoming": "Próximo"
+  },
+  "progress": {
+    "title": "PROGRESO",
+    "timeline": "Línea de 20 Semanas",
+    "currentWeek": "Semana {{number}}",
+    "measurements": "Medidas Corporales",
+    "addMeasurement": "Registrar Medidas",
+    "keyLifts": "Levantamientos Clave",
+    "personalRecords": "Récords Personales",
+    "photos": "Fotos de Progreso",
+    "addPhoto": "Agregar Foto",
+    "noData": "Sin datos aún. Empieza a registrar.",
+    "bodyweight": "Peso Corporal",
+    "waist": "Cintura",
+    "chest": "Pecho",
+    "armLeft": "Brazo Izq.",
+    "armRight": "Brazo Der.",
+    "quadLeft": "Cuádricep Izq.",
+    "quadRight": "Cuádricep Der.",
+    "calfLeft": "Pantorrilla Izq.",
+    "calfRight": "Pantorrilla Der.",
+    "save": "Guardar",
+    "prDate": "Establecido el {{date}}"
+  },
+  "community": {
+    "title": "COMUNIDAD",
+    "leaderboard": "Tabla de Clasificación",
+    "challenge": "Desafío de la Semana",
+    "prFeed": "Feed de PRs",
+    "rank": "#{{number}}",
+    "sessions": "{{count}} sesiones",
+    "winner": "Campeón Semanal",
+    "yourRank": "Tu Posición",
+    "noShares": "No hay PRs compartidos esta semana.",
+    "challengeComplete": "Desafío Completado",
+    "challengeProgress": "{{done}} / {{target}}"
+  },
+  "profile": {
+    "title": "PERFIL",
+    "editProfile": "Editar Perfil",
+    "currentWeek": "Semana Actual",
+    "weekOf20": "Semana {{week}} de 20",
+    "equipment": "Equipamiento",
+    "goals": "Objetivos",
+    "units": "Unidades",
+    "language": "Idioma",
+    "notifications": "Notificaciones",
+    "subscription": "Suscripción",
+    "manageSubscription": "Administrar Suscripción",
+    "resubscribe": "Resuscribirse",
+    "subscriptionActive": "Activa — $19.99/mes",
+    "subscriptionTrial": "Prueba Gratuita",
+    "subscriptionCancelled": "Cancelada",
+    "stats": {
+      "title": "Estadísticas",
+      "totalSessions": "Sesiones Totales",
+      "currentStreak": "Racha Actual",
+      "longestStreak": "Racha Más Larga",
+      "heaviestSquat": "Sentadilla Más Pesada",
+      "heaviestPullUp": "Dominada Más Pesada",
+      "heaviestRDL": "RDL Más Pesado"
+    },
+    "creator": "Programa por Sazyi Rey",
+    "signOut": "Cerrar Sesión",
+    "save": "Guardar Cambios"
+  },
+  "paywall": {
+    "title": "TU PRUEBA HA TERMINADO",
+    "subtitle": "Continúa construyendo el físico.",
+    "price": "$19.99",
+    "period": "/ mes",
+    "features": [
+      "Programa completo de 20 semanas",
+      "6 días de entrenamiento con sustitutos",
+      "Progresión fase por fase",
+      "Seguimiento de progreso y gráficos",
+      "Protocolos diarios y nutrición",
+      "Comunidad y tabla de clasificación"
+    ],
+    "cta": "Iniciar Suscripción",
+    "processing": "Procesando...",
+    "guarantee": "Cancela en cualquier momento. Sin preguntas.",
+    "cancelled": {
+      "title": "SUSCRIPCIÓN CANCELADA",
+      "body": "Reactiva para acceder a tu programa.",
+      "cta": "Resuscribirse"
+    }
+  },
+  "cardio": {
+    "liss": {
+      "title": "Caminata LISS en Incline",
+      "desc": "Caminadora 5–7% inclinación · 5–6 km/h · 35–45 min · FC objetivo 120–140ppm"
+    },
+    "hiit": {
+      "title": "Intervalos HIIT de Sprint",
+      "desc": "8–10 rondas · 30s sprint máximo · 90s caminata · Total 20–25 min"
+    },
+    "walk": {
+      "title": "Caminata Diaria",
+      "desc": "30–60 min al aire libre · Objetivo 8,000–12,000 pasos"
+    },
+    "assault": {
+      "title": "HIIT en Bicicleta Assault",
+      "desc": "10 rondas · 20s esfuerzo máximo · 40s pedal fácil · Solo después de tren superior"
+    }
+  },
+  "protocol": {
+    "morning": {
+      "title": "Descompresión Matutina",
+      "cold_shower": { "title": "Ducha Fría", "desc": "3–5 min lo más fría posible — aumenta la norepinefrina un 300%" },
+      "sunlight": { "title": "Luz Solar al Aire Libre", "desc": "10 min sin gafas de sol — establece el ritmo de cortisol del día" },
+      "dead_hang": { "title": "Colgarse (Dead Hang)", "desc": "2 × 45 seg — descomprime la columna y añade altura con el tiempo" },
+      "cat_cow": { "title": "Gato-Vaca", "desc": "15 repeticiones lentas — moviliza cada segmento vertebral" },
+      "childs_pose": { "title": "Postura del Niño", "desc": "45 seg — respira hacia la espalda baja para liberar tensión torácica" },
+      "hip_flexor": { "title": "Estiramiento de Flexores de Cadera", "desc": "30 seg por lado — deshace los efectos de sentarse y el trabajo físico" },
+      "vacuum": { "title": "Respiración al Vacío", "desc": "5 × 20 seg en estómago vacío — reduce la cintura en 4–8 semanas" },
+      "breakfast": { "title": "Desayuno Alto en Proteínas", "desc": "40–50g dentro de 60 min al despertar — detiene la degradación muscular nocturna" }
+    },
+    "night": {
+      "title": "Protocolo Nocturno",
+      "dead_hang": { "title": "Colgarse (Dead Hang)", "desc": "2 × 45 seg — deshace la compresión gravitacional del día en la columna" },
+      "cat_cow": { "title": "Gato-Vaca", "desc": "15 repeticiones — libera la tensión vertebral acumulada" },
+      "childs_pose": { "title": "Postura del Niño", "desc": "45 seg — liberación torácica y lumbar" },
+      "hip_flexor": { "title": "Estiramiento de Flexores de Cadera", "desc": "30 seg por lado" },
+      "magnesium": { "title": "Glicinato de Magnesio", "desc": "400mg — mejora el sueño profundo y la testosterona en un 17%" },
+      "temperature": { "title": "Temperatura de la Habitación", "desc": "18–20°C / 64–68°F — óptima para la liberación de hormona de crecimiento durante el sueño" },
+      "no_screens": { "title": "Sin Pantallas", "desc": "60 min antes de dormir — la luz azul retrasa el sueño profundo 90 min" },
+      "casein": { "title": "Caseína / Yogur Griego", "desc": "Proteína de liberación lenta durante la noche para la síntesis proteica muscular" }
+    }
+  },
+  "supplements": {
+    "creatine": { "title": "Monohidrato de Creatina", "desc": "5g diarios — aumenta la fuerza y el volumen muscular" },
+    "whey": { "title": "Proteína de Suero", "desc": "Para alcanzar tu objetivo diario de proteínas" },
+    "vitamin_d": { "title": "Vitamina D3 + K2", "desc": "Diariamente — apoya la testosterona y la densidad ósea" },
+    "magnesium": { "title": "Glicinato de Magnesio", "desc": "400mg nocturno — sueño profundo y recuperación" },
+    "omega3": { "title": "Omega-3", "desc": "2–3g diarios — reduce la inflamación y protege las articulaciones" }
+  },
+  "workouts": {
+    "day1": {
+      "name": "Ancho de Espalda",
+      "sessionWhy": "La espalda es la base del físico en V. Los dorsales anchos hacen que la cintura se vea pequeña. Esta sesión construye anchura, corrige la postura hacia adelante y crea la silueta que hace que todo lo demás se vea mejor.",
+      "phaseNote": "Siente cada repetición. Construye la conexión mente-músculo con tus dorsales antes de cargar pesado. El estiramiento al fondo de cada jalón es donde ocurre el crecimiento.",
+      "ex1": {
+        "name": "Dominada con Peso",
+        "muscle": "Dorsales",
+        "why": "El ejercicio número 1 para el ancho de dorsales. El cuelgue muerto en la parte inferior estira completamente el dorsal. La posición estirada es donde la señalización de hipertrofia es más alta. No puede replicarse en una máquina.",
+        "sub1": { "name": "Jalón al Pecho", "exp": "Mismo patrón de movimiento en una máquina — excelente si las dominadas son demasiado difíciles." },
+        "sub2": { "name": "Dominada Asistida", "exp": "Usa la máquina asistida para progresar hacia dominadas completas." },
+        "sub3": { "name": "Pullover con Cable", "exp": "Aísla el dorsal en la posición estirada." }
+      },
+      "ex2": {
+        "name": "Jalón de Brazos Rectos con Cable",
+        "muscle": "Dorsales",
+        "why": "Aísla el dorsal sin la participación del bícep. Enseña a tu cerebro a sentir el dorsal trabajando, lo cual es fundamental para la conexión mente-músculo en la Fase I.",
+        "sub1": { "name": "Pullover con Mancuerna", "exp": "Acostado en el banco, mueve la mancuerna detrás de tu cabeza para estirar el dorsal." },
+        "sub2": { "name": "Jalón con Banda", "exp": "El mismo movimiento con una banda elástica." },
+        "sub3": { "name": "Empuje de Cable con Brazos Rectos", "exp": "Versión con cable desde una polea alta." }
+      },
+      "ex3": {
+        "name": "Remo en T con Apoyo en Pecho",
+        "muscle": "Espalda Media",
+        "why": "El apoyo en el pecho elimina la espalda baja de la ecuación para que la parte media de la espalda haga todo el trabajo. Construye el grosor 3D que hace que tu espalda parezca una pared por detrás.",
+        "sub1": { "name": "Remo en Polea Sentado", "exp": "Siéntate en una estación de cable, jala hacia tu pecho inferior con los codos a 45 grados." },
+        "sub2": { "name": "Remo con Mancuerna con Apoyo en Pecho", "exp": "Acostado boca abajo en un banco inclinado sosteniendo mancuernas." },
+        "sub3": { "name": "Remo en Máquina", "exp": "Cualquier máquina de remo con soporte en el pecho." }
+      },
+      "ex4": {
+        "name": "Face Pulls",
+        "muscle": "Deltoides Posterior / Trapecios",
+        "why": "Contrarresta directamente la postura con los hombros hacia adelante. Fortalece los deltoides posteriores y los trapecios medios, los dos músculos más responsables de estar erguido y verse seguro.",
+        "sub1": { "name": "Separación de Banda", "exp": "Separa una banda elástica a la altura del pecho manteniendo los brazos rectos." },
+        "sub2": { "name": "Máquina de Vuelo Invertido", "exp": "Siéntate de cara a la máquina y separa los almohadillados." },
+        "sub3": { "name": "Vuelo Inverso con Cable", "exp": "Cables cruzados, separa con los brazos rectos." }
+      },
+      "ex5": {
+        "name": "Remo con Cable un Solo Brazo",
+        "muscle": "Dorsales / Espalda Media",
+        "why": "El trabajo unilateral corrige los desequilibrios izquierda-derecha. Un lado siempre es más fuerte por los movimientos diarios y esto iguala ambos lados para una anchura simétrica.",
+        "sub1": { "name": "Remo con Mancuerna un Brazo", "exp": "Una rodilla y mano en el banco, jala la mancuerna hacia tu cadera." },
+        "sub2": { "name": "Remo con Banda un Brazo", "exp": "Ancla una banda y rema con un brazo." },
+        "sub3": { "name": "Remo en Máquina un Brazo", "exp": "Usa un brazo a la vez en cualquier máquina de remo." }
+      },
+      "ex6": {
+        "name": "Remo de Deltoides Posterior con Cable (Agarre Amplio)",
+        "muscle": "Deltoides Posterior",
+        "why": "Segundo movimiento de deltoides posterior de la sesión. Nunca es suficiente trabajo de deltoides posterior. Protege la articulación del hombro a largo plazo y continúa construyendo la postura.",
+        "sub1": { "name": "Pec Deck Inverso", "exp": "Siéntate de cara a la máquina pec deck e invierte el movimiento." },
+        "sub2": { "name": "Vuelo de Deltoides Posterior con Mancuerna", "exp": "Inclínate hacia adelante 45 grados y lleva las mancuernas hacia los lados." },
+        "sub3": { "name": "Vuelo Inverso con Banda", "exp": "Mismo movimiento con una banda elástica." }
+      }
+    },
+    "day2": {
+      "name": "Piernas — Cuádriceps",
+      "sessionWhy": "Los cuádriceps son tu grupo muscular más grande, por lo que necesitan el mayor volumen y la mayor cantidad de comida. Hoy es dominante en cuádriceps. Dos días dedicados a piernas por semana es la forma científicamente probada más rápida de construir piernas poderosas.",
+      "phaseNote": "Profundidad completa en cada sentadilla. El rango completo de movimiento construye significativamente más músculo que las repeticiones parciales con mayor peso. Deja tu ego en la puerta esta fase.",
+      "ex1": {
+        "name": "Sentadilla con Barra (Espalda)",
+        "muscle": "Cuádriceps / Glúteos",
+        "why": "El rey de todos los ejercicios. Libera más testosterona y hormona de crecimiento que cualquier otro movimiento. La barra alta y el torso erguido mantiene la carga en los cuádriceps en lugar de la espalda baja.",
+        "sub1": { "name": "Sentadilla Goblet", "exp": "Sostén una mancuerna frente al pecho y haz la sentadilla — ideal para principiantes que aprenden el patrón." },
+        "sub2": { "name": "Sentadilla en Smith", "exp": "La barra fija te ayuda a enfocarte en la profundidad y la forma." },
+        "sub3": { "name": "Prensa de Piernas", "exp": "Siéntate en la prensa y empuja la plataforma — pies bajos y juntos para el enfoque en cuádriceps." }
+      },
+      "ex2": {
+        "name": "Prensa de Piernas (Pies Bajos y Juntos)",
+        "muscle": "Cuádriceps",
+        "why": "Los pies bajos y juntos en la plataforma transfieren todo el estrés a los cuádriceps. Perfecto sustituto del hack squat y permite una carga más pesada que las sentadillas divididas para masa pura.",
+        "sub1": { "name": "Máquina Hack Squat", "exp": "Si está disponible esta es la mejor opción — misma posición de pies." },
+        "sub2": { "name": "Máquina V-Squat", "exp": "Similar al hack squat, excelente para el aislamiento de cuádriceps." },
+        "sub3": { "name": "Sentadilla en Smith (Pies al Frente)", "exp": "Coloca los pies ligeramente al frente y deja que la barra se deslice para cargar los cuádriceps." }
+      },
+      "ex3": {
+        "name": "Sentadilla Búlgara",
+        "muscle": "Cuádriceps / Glúteos",
+        "why": "Las investigaciones confirman que el entrenamiento unilateral desarrolla más músculo por pierna que solo la sentadilla bilateral. También corrige los desequilibrios que la mayoría desarrolla con los patrones de movimiento diarios.",
+        "sub1": { "name": "Estocada Inversa", "exp": "Da un paso atrás en una estocada manteniendo el torso erguido para el enfoque en cuádriceps." },
+        "sub2": { "name": "Step-Up con Peso", "exp": "Sube a un banco sosteniendo mancuernas." },
+        "sub3": { "name": "Prensa de Piernas una Pierna", "exp": "Una pierna a la vez en la prensa de piernas." }
+      },
+      "ex4": {
+        "name": "Extensión de Piernas (Excéntrico Lento)",
+        "muscle": "Cuádriceps",
+        "why": "El descenso de 3 segundos maximiza el tiempo bajo tensión en la posición estirada. Desarrolla el barrido del cuádricep visible desde el frente y la separación entre las cabezas del cuádricep.",
+        "sub1": { "name": "Sissy Squat", "exp": "Inclínate hacia atrás y deja que las rodillas viajen muy hacia adelante — aislamiento intenso de cuádriceps." },
+        "sub2": { "name": "Sentadilla Ciclista", "exp": "Talones elevados en placas, postura estrecha — dominante en cuádriceps." },
+        "sub3": { "name": "Sentadilla en Pared con Peso", "exp": "Sostén una placa en los muslos para resistencia adicional." }
+      },
+      "ex5": {
+        "name": "Elevación de Talones de Pie",
+        "muscle": "Gastrocnemio",
+        "why": "El estiramiento completo en la parte inferior es la única forma de crecer los gemelos realmente. La mayoría hace repeticiones parciales que solo los mantiene. Cuelga el talón del borde para el máximo estiramiento.",
+        "sub1": { "name": "Elevación de Talones Sentado", "exp": "Trabaja el sóleo por debajo — haz tanto de pie como sentado para gemelos completos." },
+        "sub2": { "name": "Elevación de Talones en Prensa", "exp": "Empuja la plataforma con solo las puntas de los pies." },
+        "sub3": { "name": "Elevación de Talones en Smith", "exp": "Párate sobre una placa bajo la barra Smith." }
+      },
+      "ex6": {
+        "name": "Rueda Abdominal",
+        "muscle": "Core",
+        "why": "Entrena el core para resistir la extensión, que es la demanda exacta al cargar cargas pesadas. Construye la fuerza abdominal profunda que protege la espalda baja y también crea densidad del core.",
+        "sub1": { "name": "Crunch en Cable", "exp": "Arrodíllate en un cable alto y lleva las costillas a las caderas." },
+        "sub2": { "name": "Plancha con Peso", "exp": "Plancha estándar con una placa en la espalda." },
+        "sub3": { "name": "Dead Bug", "exp": "Acostado boca arriba, alterna extendiendo el brazo y pierna opuestos." }
+      }
+    },
+    "day3": {
+      "name": "Pecho y Brazos",
+      "sessionWhy": "El pecho superior da la ilusión de un físico más grande y lleno incluso con camisa. Los brazos se entrenan aquí para que reciban trabajo directo sin superponerse con el día de espalda. Cero trabajo pesado de oblicuos en este programa — ensancha la cintura permanentemente.",
+      "phaseNote": "Haz superseries con los ejercicios de brazos al final para ahorrar tiempo y crear una bomba masiva que acelera el crecimiento. Enfócate en el estiramiento en la parte inferior de cada movimiento de press.",
+      "ex1": {
+        "name": "Press Inclinado con Barra",
+        "muscle": "Pecho Superior",
+        "why": "El pecho superior es la área más subdesarrollada en la mayoría de los levantadores. Un pecho superior completo crea el aspecto de estante y hace que el pecho sea visible al estar de pie. La inclinación de 30–45 grados es el punto científicamente probado para la activación del pectoral superior.",
+        "sub1": { "name": "Press Inclinado con Mancuernas", "exp": "Las mancuernas permiten un mayor rango de movimiento y corrigen desequilibrios izquierda-derecha." },
+        "sub2": { "name": "Press Inclinado en Smith", "exp": "La barra fija elimina las exigencias de equilibrio para que puedas enfocarte puramente en el pecho." },
+        "sub3": { "name": "Vuelo de Pecho Superior con Cable", "exp": "Cables de abajo hacia arriba golpeando el pecho superior con tensión constante." }
+      },
+      "ex2": {
+        "name": "Vuelo Inclinado con Mancuerna",
+        "muscle": "Pecho Superior",
+        "why": "El amplio arco crea el máximo estiramiento en las fibras del pectoral. El entrenamiento en posición estirada desencadena la activación de células satélite, que es el mecanismo detrás del verdadero crecimiento de las fibras musculares.",
+        "sub1": { "name": "Vuelo con Cable de Alto a Bajo", "exp": "Cables altos, vuela hacia abajo y cruzando — tensión constante durante todo el movimiento." },
+        "sub2": { "name": "Pec Deck Inclinado", "exp": "Si la máquina se ajusta a inclinado, úsala para el mismo estiramiento." },
+        "sub3": { "name": "Vuelo con Banda Elástica", "exp": "Ancla las bandas detrás de ti y junta los brazos." }
+      },
+      "ex3": {
+        "name": "Cruce de Cables (Alto a Bajo)",
+        "muscle": "Pecho Inferior",
+        "why": "El cable proporciona tensión constante durante todo el movimiento que las mancuernas no pueden. Desarrolla la línea de separación del pecho inferior visible cuando te quitas la camisa.",
+        "sub1": { "name": "Vuelo con Mancuerna Plano", "exp": "Acostado plano, vuela las mancuernas en un arco amplio." },
+        "sub2": { "name": "Máquina Pec Deck", "exp": "Siéntate y aprieta los almohadillados juntos — excelente tensión constante." },
+        "sub3": { "name": "Flexión con Peso", "exp": "Eleva los pies y coloca peso en la espalda para resistencia adicional." }
+      },
+      "ex4": {
+        "name": "Press de Banca Agarre Estrecho",
+        "muscle": "Tríceps",
+        "why": "Los tríceps conforman dos tercios de la parte superior del brazo. El press de agarre estrecho permite la carga más pesada de cualquier ejercicio de tríceps — más peso equivale a más tensión mecánica equivale a más crecimiento.",
+        "sub1": { "name": "Fondos con Peso", "exp": "Inclínate ligeramente hacia adelante y haz fondos con peso entre las piernas o en un cinturón." },
+        "sub2": { "name": "Press de Tríceps con Mancuernas (Agarre Estrecho)", "exp": "Mancuernas juntas sobre un banco plano." },
+        "sub3": { "name": "Smith Agarre Estrecho", "exp": "La barra fija ayuda a mantener los codos alineados." }
+      },
+      "ex5": {
+        "name": "Extensión de Tríceps en Cable (Sobre la Cabeza)",
+        "muscle": "Tríceps (Cabeza Larga)",
+        "why": "El único movimiento que estira completamente la cabeza larga del tríceps. La cabeza larga es la más grande de las tres y da la forma de herradura cuando está desarrollada. Debe entrenarse en posición estirada.",
+        "sub1": { "name": "Extensión de Tríceps con Mancuerna Sobre la Cabeza", "exp": "Sostén una mancuerna con ambas manos detrás de la cabeza." },
+        "sub2": { "name": "Extensión con Barra EZ Sobre la Cabeza", "exp": "El mismo movimiento con barra — más estable." },
+        "sub3": { "name": "Extensión con Banda Sobre la Cabeza", "exp": "Ancla una banda en los pies y extiende sobre la cabeza." }
+      },
+      "ex6": {
+        "name": "Curl Inclinado con Mancuerna",
+        "muscle": "Bíceps (Cabeza Larga)",
+        "why": "El brazo posicionado detrás del cuerpo en el banco inclinado crea un estiramiento completo en la cabeza larga del bíceps. La cabeza larga es la que crea el pico al flexionar. Los curls planos no llegan a este estiramiento.",
+        "sub1": { "name": "Curl con Cable desde Polea Baja", "exp": "Párate en una máquina de cable y haz curl — tensión constante durante todo." },
+        "sub2": { "name": "Spider Curl", "exp": "Acostado boca abajo en un banco inclinado y haz curl — elimina todo el engaño." },
+        "sub3": { "name": "Curl con Banda Sentado", "exp": "Siéntate en un banco con la banda debajo de los pies." }
+      },
+      "ex7": {
+        "name": "Curl con Martillo",
+        "muscle": "Braquial",
+        "why": "El agarre neutro trabaja el braquial, el músculo debajo del bíceps. Cuando el braquial se desarrolla empuja físicamente el bíceps hacia arriba haciendo que tus brazos se vean significativamente más gruesos desde todos los ángulos.",
+        "sub1": { "name": "Curl con Cuerda", "exp": "Usa el accesorio de cuerda en un cable bajo." },
+        "sub2": { "name": "Curl Cruzado con Martillo", "exp": "Curl cruzando el cuerpo para enfatizar el braquial." },
+        "sub3": { "name": "Curl Inverso", "exp": "Agarre prono en barra o cables para trabajar braquial y antebrazos." }
+      }
+    },
+    "day4": {
+      "name": "Piernas — Isquiotibiales",
+      "sessionWhy": "Día de cadena posterior. Los glúteos débiles causan inclinación pélvica anterior que hace que el estómago sobresalga incluso cuando estás delgado. Construye esta cadena posterior y automáticamente te paras más erguido y te ves más delgado sin cambiar nada más.",
+      "phaseNote": "El RDL es el ejercicio más importante del día. Dedica tiempo extra a sentir el estiramiento de los isquiotibiales en la parte inferior. Esa posición estirada es exactamente donde crece el músculo.",
+      "ex1": {
+        "name": "Peso Muerto Rumano",
+        "muscle": "Isquiotibiales",
+        "why": "El mejor ejercicio de isquiotibiales que existe. El profundo estiramiento en la parte inferior carga completamente los isquiotibiales en su posición alargada. La ciencia confirma que el entrenamiento en posición estirada construye significativamente más músculo.",
+        "sub1": { "name": "RDL con Mancuernas", "exp": "El mismo movimiento con mancuernas — excelente si estás aprendiendo el patrón de bisagra." },
+        "sub2": { "name": "RDL una Pierna", "exp": "Una pierna a la vez para el máximo estiramiento de isquiotibiales y desafío de equilibrio." },
+        "sub3": { "name": "Pull-Through con Cable", "exp": "Párate de espaldas a un cable bajo e inclínate hacia adelante." }
+      },
+      "ex2": {
+        "name": "Curl de Pierna Unilateral (Acostado)",
+        "muscle": "Isquiotibiales",
+        "why": "Obliga a cada pierna a trabajar de forma independiente. La mayoría tiene un isquiotibial significativamente más débil en un lado por los patrones de movimiento diarios. Esto identifica y corrige el desequilibrio antes de que se convierta en una lesión.",
+        "sub1": { "name": "Curl Nórdico", "exp": "Arrodíllate sobre una almohadilla con los pies anclados y baja el cuerpo hacia adelante — brutalmente efectivo." },
+        "sub2": { "name": "Curl de Pierna con Pelota Suiza", "exp": "Acostado boca arriba con los talones en la pelota y llévala hacia ti." },
+        "sub3": { "name": "Curl de Pierna con Banda", "exp": "Ancla la banda a la altura del tobillo y haz curl." }
+      },
+      "ex3": {
+        "name": "Empuje de Cadera con Barra",
+        "muscle": "Glúteos",
+        "why": "Las investigaciones de EMG confirman que los empujes de cadera producen mayor activación de glúteos que cualquier otro ejercicio incluyendo sentadillas. Los glúteos fuertes significan postura erguida, sin dolor lumbar y movimiento atlético poderoso.",
+        "sub1": { "name": "Empuje de Cadera con Mancuernas", "exp": "El mismo movimiento con mancuernas en las caderas." },
+        "sub2": { "name": "Empuje de Cadera una Pierna", "exp": "Una pierna a la vez — duplica la intensidad y corrige desequilibrios." },
+        "sub3": { "name": "Pull-Through con Cable", "exp": "De espaldas al cable e inclínate para apretar los glúteos en la parte superior." }
+      },
+      "ex4": {
+        "name": "Buenos Días",
+        "muscle": "Erectores Espinales",
+        "why": "Desarrolla los erectores espinales, los músculos que corren a lo largo de la columna. Se traduce directamente en mejor postura y protege la espalda baja durante cualquier actividad física pesada.",
+        "sub1": { "name": "Extensión de Espalda", "exp": "Acostado boca abajo en un banco de hiperextensión y extiende el cuerpo hacia arriba." },
+        "sub2": { "name": "Pull-Through con Cable", "exp": "El mismo patrón de bisagra de cadera con cable para tensión constante." },
+        "sub3": { "name": "Buenos Días con Mancuernas", "exp": "Sostén mancuernas en los hombros en lugar de barra." }
+      },
+      "ex5": {
+        "name": "Elevación de Talones Sentado",
+        "muscle": "Sóleo",
+        "why": "La posición con rodillas flexionadas desactiva el gastrocnemio y aísla el sóleo que está debajo. Necesitas entrenar ambas cabezas del gemelo para un desarrollo completo visible desde todos los ángulos.",
+        "sub1": { "name": "Elevación de Talones en Prensa (Sentado)", "exp": "Siéntate en la prensa con rodillas flexionadas y empuja solo con las puntas de los pies." },
+        "sub2": { "name": "Elevación de Talones con Banda Sentado", "exp": "Siéntate en un banco con la banda sobre las rodillas y empuja hacia abajo." }
+      },
+      "ex6": {
+        "name": "Elevación de Piernas Colgado",
+        "muscle": "Abdominales Inferiores",
+        "why": "La inclinación pélvica posterior en la parte superior es lo que hace esto efectivo — sin ella solo estás balanceando los flexores de cadera. Los abdominales inferiores son la última parte del six pack en aparecer y la más difícil de desarrollar.",
+        "sub1": { "name": "Elevación de Piernas en Silla Capitana", "exp": "El mismo movimiento en una máquina de silla capitana." },
+        "sub2": { "name": "Crunch Inverso con Peso", "exp": "Acostado en un banco y lleva las caderas hacia el techo." },
+        "sub3": { "name": "Crunch con Cable desde Polea Baja", "exp": "Jala el cable hacia las caderas mientras estás acostado boca arriba." }
+      }
+    },
+    "day5": {
+      "name": "Hombros y Espalda Gruesa",
+      "sessionWhy": "Los hombros anchos completan el físico en V. Combinado con el grosor de espalda hoy, tu parte superior del cuerpo se verá ancha y poderosa desde todos los ángulos. Esta es la sesión que hace que el físico se vea completo.",
+      "phaseNote": "Las elevaciones laterales son el ejercicio más importante para el ancho de hombros. Nunca cargues tanto que tengas que balancearte. Lento y controlado con una ligera inclinación hacia el lado contrario es lo que realmente desarrolla el deltoides lateral.",
+      "ex1": {
+        "name": "Press de Hombro con Mancuernas (Sentado)",
+        "muscle": "Hombros",
+        "why": "La posición sentada elimina la capacidad de usar el impulso de las piernas, por lo que es trabajo puro de hombros. Las mancuernas permiten un arco natural que protege el manguito rotador comparado con una barra fija.",
+        "sub1": { "name": "Press de Hombro con Barra", "exp": "De pie o sentado con barra — permite mayor carga." },
+        "sub2": { "name": "Press de Hombro en Smith", "exp": "La trayectoria fija ayuda a los principiantes a aprender el movimiento de press." },
+        "sub3": { "name": "Press de Hombro con Cable", "exp": "Cables desde los lados presionando hacia arriba — tensión constante." }
+      },
+      "ex2": {
+        "name": "Elevación Lateral con Cable (Unilateral)",
+        "muscle": "Deltoides Lateral",
+        "why": "El cable proporciona tensión constante durante todo el movimiento mientras que las mancuernas tienen cero tensión en la parte inferior. El deltoides lateral es el músculo que crea la anchura visible de los hombros y este es el ejercicio más importante para verse más ancho.",
+        "sub1": { "name": "Elevación Lateral con Mancuerna", "exp": "El clásico — ligera inclinación y ligera flexión en el codo." },
+        "sub2": { "name": "Máquina de Elevación Lateral", "exp": "Ideal para principiantes — elimina el desafío de estabilidad." },
+        "sub3": { "name": "Elevación Lateral con Banda", "exp": "Ancla la banda bajo el pie y eleva hacia el lado." }
+      },
+      "ex3": {
+        "name": "Remo con Cable Sentado (Agarre Amplio)",
+        "muscle": "Trapecios Medios / Romboides",
+        "why": "El agarre amplio y los codos a 45 grados trabaja específicamente los trapecios medios y romboides — los músculos que mantienen los hombros hacia atrás y crean grosor de espalda visto por detrás.",
+        "sub1": { "name": "Remo con Barra Pronado", "exp": "Inclínate hacia adelante y jala la barra hacia el pecho inferior." },
+        "sub2": { "name": "Remo en T", "exp": "Pecho en el soporte y jala la barra hacia el esternón." },
+        "sub3": { "name": "Remo con Mancuerna", "exp": "Una rodilla en el banco, jala la mancuerna hacia la cadera." }
+      },
+      "ex4": {
+        "name": "Remo con Mancuerna un Brazo (Codo Alto)",
+        "muscle": "Dorsal Superior / Teres Mayor",
+        "why": "Tirar con codo alto hacia la cadera en lugar de directamente hacia arriba trabaja el dorsal superior y el teres mayor — los músculos que crean la anchura justo bajo la axila. La mayoría de los remos no llegan a esta zona.",
+        "sub1": { "name": "Meadows Row", "exp": "Carga un extremo de la barra y realiza el remo con codo alto — mismo ángulo." },
+        "sub2": { "name": "Remo Alto con Cable un Brazo", "exp": "Ajusta el cable a la altura del hombro y jala cruzando el cuerpo." },
+        "sub3": { "name": "Remo en Máquina un Brazo", "exp": "Usa un brazo a la vez en cualquier máquina de remo." }
+      },
+      "ex5": {
+        "name": "Vuelo de Deltoides Posterior con Cable",
+        "muscle": "Deltoides Posterior",
+        "why": "Este es el tercer movimiento de deltoides posterior en la semana y necesitas este volumen para deshacer la postura encorvada que se acumula durante meses y años de vida diaria. Los deltoides posteriores se recuperan rápido y responden bien a alta frecuencia.",
+        "sub1": { "name": "Pec Deck Inverso", "exp": "Siéntate de cara a la máquina e invierte el movimiento." },
+        "sub2": { "name": "Vuelo de Deltoides Posterior con Mancuerna", "exp": "Inclínate 45 grados y lleva las mancuernas hacia los lados." },
+        "sub3": { "name": "Vuelo Inverso con Banda", "exp": "Misma posición inclinada con banda elástica." }
+      },
+      "ex6": {
+        "name": "Encogimientos con Mancuernas",
+        "muscle": "Trapecios Superiores",
+        "why": "Los trapecios superiores bien desarrollados hacen que el físico se vea poderoso y atlético desde el frente y la espalda. Mantén la contracción máxima durante un segundo completo — la posición contraída es donde el estímulo de crecimiento es más alto.",
+        "sub1": { "name": "Encogimientos con Barra", "exp": "Permite mayor carga que las mancuernas." },
+        "sub2": { "name": "Encogimientos con Cable", "exp": "Tensión constante durante todo el movimiento." },
+        "sub3": { "name": "Encogimientos en Smith", "exp": "La barra fija te ayuda a enfocarte en la contracción más que en el equilibrio." }
+      },
+      "ex7": {
+        "name": "Plancha con Peso",
+        "muscle": "Core / Transverso del Abdomen",
+        "why": "Entrena el transverso del abdomen, tu cinturón natural. Cuando este músculo es fuerte físicamente aprieta la cintura hacia adentro. Combinado con la respiración al vacío diaria es el principal impulsor del objetivo de cintura pequeña.",
+        "sub1": { "name": "Rueda Abdominal", "exp": "Rueda lentamente hacia afuera y de regreso — entrena el mismo patrón anti-extensión." },
+        "sub2": { "name": "Dead Bug", "exp": "Acostado boca arriba, alterna extendiendo brazo y pierna opuestos manteniendo la espalda baja pegada al suelo." },
+        "sub3": { "name": "Posición Hueco (Hollow Body)", "exp": "Presiona la espalda baja contra el suelo y mantén piernas y brazos extendidos." }
+      }
+    },
+    "day6": {
+      "name": "Brazos y Core",
+      "sessionWhy": "Volumen extra de brazos cada dos semanas les da a bíceps y tríceps una sesión dedicada además del trabajo que ya reciben en el día de pecho. Los brazos responden más rápido a la frecuencia. El trabajo de core aquí se enfoca en construir densidad muscular real y el protocolo de vacío TVA.",
+      "phaseNote": "Mantén esto bajo 60 minutos. Esta es una sesión extra — calidad y sensación sobre peso y ego.",
+      "ex1": {
+        "name": "Curl en Predicador con Barra EZ",
+        "muscle": "Bíceps",
+        "why": "El banco predicador bloquea el brazo superior en su lugar eliminando completamente cualquier impulso o trampa. Esto obliga al bíceps a hacer el 100% del trabajo a través del rango completo de movimiento.",
+        "sub1": { "name": "Curl en Predicador en Máquina", "exp": "Misma posición bloqueada en una máquina — ideal para principiantes." },
+        "sub2": { "name": "Curl en Predicador con Cable", "exp": "Usa un cable bajo en el banco predicador para tensión constante." },
+        "sub3": { "name": "Curl en Predicador con Mancuerna", "exp": "Misma posición bloqueada con mancuerna para trabajo unilateral." }
+      },
+      "ex2": {
+        "name": "Curl con Cable (Supinado)",
+        "muscle": "Bíceps",
+        "why": "Supinar la muñeca completamente en la parte superior del movimiento maximiza la contracción máxima del bíceps. Mantener ese apretón durante un segundo en la parte superior crea el máximo estímulo de crecimiento.",
+        "sub1": { "name": "Curl con Mancuerna", "exp": "Curl estándar con mancuerna con supinación completa en la parte superior." },
+        "sub2": { "name": "Curl con Barra", "exp": "Permite mayor carga — excelente para masa general de bíceps." },
+        "sub3": { "name": "Curl con Banda", "exp": "Ancla la banda bajo el pie y haz curl — tensión constante." }
+      },
+      "ex3": {
+        "name": "Skull Crusher con Barra EZ",
+        "muscle": "Tríceps (Cabeza Larga)",
+        "why": "Carga la cabeza larga del tríceps en su posición completamente estirada, donde responde mejor al estímulo de crecimiento. La cabeza larga constituye la mayor parte del tamaño del tríceps y da la forma de herradura.",
+        "sub1": { "name": "Skull Crusher con Mancuernas", "exp": "El mismo movimiento con mancuernas — permite que los brazos viajen más atrás para mayor estiramiento." },
+        "sub2": { "name": "Extensión con Cable Sobre la Cabeza", "exp": "De espaldas al cable y extiende sobre la cabeza." },
+        "sub3": { "name": "Fondos", "exp": "Inclínate ligeramente hacia adelante para enfatizar la cabeza larga." }
+      },
+      "ex4": {
+        "name": "Jalón de Tríceps con Cuerda",
+        "muscle": "Tríceps (Cabeza Lateral)",
+        "why": "Separar la cuerda en la parte inferior de cada repetición crea la máxima contracción de la cabeza lateral. La cabeza lateral es la que crea la forma de herradura visible de lado cuando el brazo está relajado.",
+        "sub1": { "name": "Jalón con Barra V", "exp": "Agarre estrecho enfatiza la cabeza lateral." },
+        "sub2": { "name": "Patada de Tríceps con Mancuerna", "exp": "Inclínate hacia adelante y extiende el brazo recto hacia atrás." },
+        "sub3": { "name": "Jalón con Banda", "exp": "Ancla la banda encima y empuja hacia abajo." }
+      },
+      "ex5": {
+        "name": "Crunch en Cable (Arrodillado)",
+        "muscle": "Abdominales",
+        "why": "El trabajo abdominal con peso construye densidad muscular abdominal real. No puedes tener abdominales impresionantes sin primero construir el músculo debajo de la grasa. El entrenamiento construye el músculo y la dieta lo revela.",
+        "sub1": { "name": "Crunch con Peso Declinado", "exp": "Acostado en un banco declinado sosteniendo una placa en el pecho." },
+        "sub2": { "name": "Crunch en Máquina", "exp": "Siéntate en una máquina abdominal y haz crunch — ideal para principiantes." },
+        "sub3": { "name": "Rueda Abdominal", "exp": "Rueda hacia afuera y de regreso — similar al crunch con cable pero con peso corporal." }
+      },
+      "ex6": {
+        "name": "Elevación de Piernas Colgado",
+        "muscle": "Abdominales Inferiores",
+        "why": "Los abdominales inferiores son la última sección del six pack en aparecer y la más difícil de desarrollar realmente. La inclinación pélvica posterior en la parte superior es esencial — sin esta señal solo estás entrenando flexores de cadera.",
+        "sub1": { "name": "Elevación en Silla Capitana", "exp": "El mismo movimiento en una máquina de silla capitana para principiantes." },
+        "sub2": { "name": "Crunch Inverso", "exp": "Acostado en un banco y lleva las caderas hacia arriba — versión sin peso." },
+        "sub3": { "name": "Crunch con Cable Polea Baja", "exp": "Jala el cable hacia las caderas mientras estás acostado en el suelo." }
+      }
+    }
+  },
+  "errors": {
+    "general": "Algo salió mal. Por favor intenta de nuevo.",
+    "network": "Sin conexión. Verifica tu internet.",
+    "auth": "Error de autenticación. Por favor inicia sesión de nuevo."
+  },
+  "common": {
+    "loading": "Cargando...",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "close": "Cerrar",
+    "kg": "kg",
+    "lbs": "lbs",
+    "cm": "cm",
+    "ft": "ft",
+    "min": "min",
+    "sec": "seg"
+  }
+}

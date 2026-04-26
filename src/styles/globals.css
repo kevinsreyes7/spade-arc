@@ -1,0 +1,139 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+
+html, body, #root {
+  height: 100%;
+  overscroll-behavior: none;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  background-color: #0a0d1a;
+  color: #e8eaf0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ─── Film Grain Overlay ─── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  opacity: 0.038;
+  z-index: 9998;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #1e2d4a; border-radius: 2px; }
+
+/* ─── Selection ─── */
+::selection { background: rgba(74, 111, 165, 0.35); color: #c8d4f0; }
+
+/* ─── Input number spinners ─── */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type=number] { -moz-appearance: textfield; }
+
+/* ─── Focus rings ─── */
+*:focus-visible {
+  outline: 2px solid #4a6fa5;
+  outline-offset: 2px;
+}
+
+/* ─── Safe area padding utility ─── */
+.pb-safe { padding-bottom: max(1rem, calc(1rem + var(--safe-bottom))); }
+.pt-safe { padding-top: max(1rem, calc(1rem + var(--safe-top))); }
+
+/* ─── Bottom nav safe area ─── */
+.bottom-nav {
+  padding-bottom: max(0.75rem, var(--safe-bottom));
+}
+
+/* ─── Card hover glow ─── */
+.card-hover {
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.card-hover:hover {
+  box-shadow: 0 0 22px rgba(74, 111, 165, 0.18);
+  border-color: #2d4a7a;
+}
+
+/* ─── Glass card ─── */
+.glass {
+  background: rgba(17, 24, 39, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ─── Display font utility ─── */
+.font-display {
+  font-family: 'Bebas Neue', cursive;
+  letter-spacing: 0.05em;
+}
+
+/* ─── Phase colour utilities ─── */
+.phase-1 { color: #4a6fa5; }
+.phase-2 { color: #7b9fd4; }
+.phase-3 { color: #c8d4f0; }
+.phase-4 { color: #f0c040; }
+.phase-bg-1 { background-color: rgba(74, 111, 165, 0.15); }
+.phase-bg-2 { background-color: rgba(123, 159, 212, 0.15); }
+.phase-bg-3 { background-color: rgba(200, 212, 240, 0.12); }
+.phase-bg-4 { background-color: rgba(240, 192, 64, 0.12); }
+
+/* ─── Gradient text ─── */
+.text-gradient {
+  background: linear-gradient(135deg, #c8d4f0, #7b9fd4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Shimmer loading ─── */
+@keyframes shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: calc(200px + 100%) 0; }
+}
+.shimmer {
+  background: linear-gradient(90deg, #111827 0px, #1e2d4a 40px, #111827 80px);
+  background-size: 200px 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+/* ─── Workout rest timer ring ─── */
+.timer-ring {
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+
+/* ─── Bottom sheet backdrop ─── */
+.backdrop {
+  background: rgba(10, 13, 26, 0.8);
+  backdrop-filter: blur(4px);
+}
+
+/* ─── Tap highlight ─── */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
