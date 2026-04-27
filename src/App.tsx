@@ -10,6 +10,9 @@ import { Community } from '@/pages/Community'
 import { Profile } from '@/pages/Profile'
 import { Workout } from '@/pages/Workout'
 import { Paywall } from '@/pages/Paywall'
+import { Nutrition } from '@/pages/Nutrition'
+import { Library } from '@/pages/Library'
+import { ArticleReader } from '@/pages/ArticleReader'
 import { useAuthContext } from '@/context/AuthContext'
 
 function AppRoutes() {
@@ -41,6 +44,9 @@ function AppRoutes() {
       <Route path="/community" element={<AuthGuard><Community /></AuthGuard>} />
       <Route path="/profile" element={<AuthGuard><Profile /></AuthGuard>} />
       <Route path="/workout/:dayId" element={<AuthGuard><Workout /></AuthGuard>} />
+      <Route path="/nutrition" element={<AuthGuard><Nutrition /></AuthGuard>} />
+      <Route path="/library" element={<AuthGuard><Library /></AuthGuard>} />
+      <Route path="/library/:id" element={<AuthGuard><ArticleReader /></AuthGuard>} />
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />

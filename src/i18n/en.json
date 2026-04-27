@@ -9,6 +9,9 @@
     "schedule": "Schedule",
     "progress": "Progress",
     "community": "Community",
+    "train": "Train",
+    "nutrition": "Nutrition",
+    "library": "Library",
     "profile": "Profile"
   },
   "onboarding": {

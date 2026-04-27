@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/Button'
 import { useAuthContext } from '@/context/AuthContext'
 import { useProfile } from '@/context/ProfileContext'
+import { MatrixRain } from '@/components/MatrixRain'
 
 export function Welcome() {
   const { t } = useTranslation()
@@ -11,20 +12,34 @@ export function Welcome() {
   const { user } = useAuthContext()
   const { profile } = useProfile()
 
-  // Returning user — go straight to dashboard
   if (user && profile?.onboarding_complete) {
     navigate('/home', { replace: true })
     return null
   }
 
   return (
-    <div className="min-h-screen bg-bg flex flex-col items-center justify-between px-6 py-12 overflow-hidden">
+    <div className="relative min-h-screen flex flex-col items-center justify-between px-6 py-12 overflow-hidden" style={{ backgroundColor: '#0a0d1a' }}>
+      {/* Cosmic nebula at 20% opacity — adds depth behind the rain */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          zIndex: 0,
+          backgroundImage: 'url(https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=800)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          opacity: 0.2,
+        }}
+      />
+      <MatrixRain />
+
       {/* Top — brand */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="flex flex-col items-center pt-8"
+        className="relative z-10 flex flex-col items-center pt-8"
       >
         <motion.div
           animate={{ rotate: [0, 3, -3, 0], scale: [1, 1.04, 1] }}
@@ -44,7 +59,7 @@ export function Welcome() {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.3, duration: 0.5 }}
-        className="text-center"
+        className="relative z-10 text-center"
       >
         <h2 className="font-display text-4xl text-textPrimary tracking-wider mb-4">
           {t('onboarding.welcome.title')}
@@ -61,7 +76,7 @@ export function Welcome() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5, duration: 0.5 }}
-        className="flex flex-col items-center gap-4 w-full max-w-sm"
+        className="relative z-10 flex flex-col items-center gap-4 w-full max-w-sm"
       >
         <Link to="/onboarding" className="w-full">
           <Button size="xl" fullWidth className="font-display text-2xl tracking-widest">

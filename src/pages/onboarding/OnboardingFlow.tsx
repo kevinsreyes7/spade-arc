@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthContext } from '@/context/AuthContext'
 import { useProfile } from '@/context/ProfileContext'
 import { supabase } from '@/lib/supabase'
+
 import type { DayOfWeek, Equipment, FitnessLevel, Sex, UnitPreference } from '@/types'
 import { Account } from './Account'
 import { AboutYou } from './AboutYou'
@@ -39,17 +40,26 @@ export function OnboardingFlow() {
   const navigate = useNavigate()
   const { user } = useAuthContext()
   const [step, setStep] = useState<Step>('account')
-  const { refresh } = useProfile()
+  const { profile, loading: profileLoading, refresh } = useProfile()
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState('')
 
-  // If user already has an account (e.g. page refresh mid-onboarding),
-  // skip the account creation step
+  // If a logged-in user with a completed profile somehow lands here, send them home.
   useEffect(() => {
-    if (user && step === 'account') {
+    if (!profileLoading && user && profile?.onboarding_complete) {
+      navigate('/home', { replace: true })
+    }
+  }, [user, profile, profileLoading, navigate])
+
+  // Only skip Account step if a session already existed when the page loaded
+  // (e.g. page refresh mid-onboarding). Don't fire when user just signed up.
+  const hadUserOnMount = useRef(!!user)
+  useEffect(() => {
+    if (hadUserOnMount.current && step === 'account') {
       setStep('about')
     }
-  }, [user, step])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const [state, setState] = useState<OnboardingState>({
     name: '', age: '', sex: '', heightCm: '', weightKg: '',
     units: 'metric', goals: [], daysPerWeek: 4, trainingDays: [],

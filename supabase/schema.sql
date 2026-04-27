@@ -121,11 +121,14 @@ ALTER TABLE decompression_logs ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can manage own decompression logs" ON decompression_logs FOR ALL USING (auth.uid() = user_id);
 
 -- ─── SUPPLEMENT LOGS ────────────────────────
+-- One row per supplement per day; unique constraint enables easy toggle (insert / delete).
 CREATE TABLE IF NOT EXISTS supplement_logs (
-  id                UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id           UUID NOT NULL REFERENCES auth.users ON DELETE CASCADE,
-  date              DATE NOT NULL,
-  supplements_taken TEXT[]
+  id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id     UUID NOT NULL REFERENCES auth.users ON DELETE CASCADE,
+  date        DATE NOT NULL,
+  supplement  TEXT NOT NULL,
+  taken_at    TIMESTAMPTZ DEFAULT NOW(),
+  CONSTRAINT supplement_logs_unique UNIQUE (user_id, date, supplement)
 );
 
 ALTER TABLE supplement_logs ENABLE ROW LEVEL SECURITY;

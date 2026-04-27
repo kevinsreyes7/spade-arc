@@ -22,10 +22,31 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
 
+  // Immediately flip loading=true the moment user becomes non-null so AuthGuard
+  // never sees the (user exists, profile=null, loading=false) race-condition window
+  // that previously caused logged-in users to be bounced to /onboarding on refresh.
+  useEffect(() => {
+    if (user) {
+      setLoading(true)
+    } else {
+      setProfile(null)
+      setLoading(false)
+    }
+  }, [user])
+
   const fetchProfile = useCallback(async () => {
-    if (!user) { setProfile(null); setLoading(false); return }
+    if (!user) {
+      setProfile(null)
+      setLoading(false)
+      return
+    }
+    setLoading(true)
     const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-    setProfile(data as Profile | null)
+    const p = data as Profile | null
+    if (p && (p.current_week == null || p.current_week < 1)) {
+      p.current_week = 1
+    }
+    setProfile(p)
     setLoading(false)
   }, [user])
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { useProfile } from '@/context/ProfileContext'
@@ -11,12 +11,16 @@ import { Button } from '@/components/ui/Button'
 import { DecompressionSheet } from '@/components/DecompressionSheet'
 import { getPhaseFromWeek, getPhaseName } from '@/data/workouts'
 import { morningProtocol, dailyQuotes } from '@/data/protocols'
-import { getTodayWorkout, getNutritionTargets } from '@/hooks/useWorkoutSchedule'
+import { getTodayWorkout, getNutritionTargets, buildWeekSchedule } from '@/hooks/useWorkoutSchedule'
 import { supabase } from '@/lib/supabase'
+import { MatrixRain } from '@/components/MatrixRain'
+
+const WEEK_ICONS = { workout: '🏋️', rest: '😴', sport: '⚽', cardio: '🏃' }
 
 export function Home() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const location = useLocation()
   const { user } = useAuthContext()
   const { profile } = useProfile()
   const [streak, setStreak] = useState(0)
@@ -30,7 +34,6 @@ export function Home() {
 
   useEffect(() => {
     if (!user) return
-    // Load streak and session count
     const today = new Date().toISOString().split('T')[0]
     supabase.from('workout_sessions')
       .select('id, date, completed_at')
@@ -61,7 +64,7 @@ export function Home() {
       .then(({ data }) => {
         if (data && data.length > 0) setDecompressionDone(true)
       })
-  }, [user])
+  }, [user, location.key])
 
   const todaySchedule = profile ? getTodayWorkout(profile, currentWeek) : null
   const isTrainingDay = todaySchedule?.type === 'workout'
@@ -77,8 +80,23 @@ export function Home() {
   const dateStr = new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })
 
   return (
-    <Layout>
-      <div className="px-4 pt-6 pb-4 max-w-lg mx-auto">
+    <>
+      {/* Subtle matrix rain — fixed behind all page content at very low opacity */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 1,
+          opacity: 0.04,
+          pointerEvents: 'none',
+        }}
+      >
+        <MatrixRain />
+      </div>
+
+      <Layout>
+      <div className="relative z-10 px-4 pt-6 pb-4 max-w-lg mx-auto">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
           <div className="flex items-start justify-between">
@@ -88,11 +106,23 @@ export function Home() {
                 {t('home.greeting', { timeOfDay, name: profile?.name ?? '' })}
               </h1>
             </div>
-            <div className="flex flex-col items-end gap-1.5">
-              <Badge variant="phase">{getPhaseName(phase)}</Badge>
-              <span className="text-xs text-textMuted font-mono">
-                {t('home.week', { number: currentWeek })}
-              </span>
+            <div className="flex items-center gap-2">
+              <div className="flex flex-col items-end gap-1.5">
+                <Badge variant="phase">{getPhaseName(phase)}</Badge>
+                <span className="text-xs text-textMuted font-mono">
+                  {t('home.week', { number: currentWeek })}
+                </span>
+              </div>
+              <button
+                onClick={() => navigate('/profile')}
+                className="w-9 h-9 rounded-full bg-card border border-border flex items-center justify-center text-textMuted hover:text-accent transition-colors"
+                aria-label="Profile"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="w-5 h-5">
+                  <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </button>
             </div>
           </div>
         </motion.div>
@@ -193,6 +223,51 @@ export function Home() {
           )}
         </motion.div>
 
+        {/* This Week */}
+        {profile && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.18 }}
+            className="mb-4"
+          >
+            <p className="text-xs text-textMuted tracking-widest uppercase mb-2">This Week</p>
+            <Card padding="none">
+              {buildWeekSchedule(profile, currentWeek).map((day, i, arr) => (
+                <div
+                  key={day.dayOfWeek}
+                  onClick={() => day.type === 'workout' && day.workoutDayId && navigate(`/workout/${day.workoutDayId}`)}
+                  className={`flex items-center gap-3 px-4 py-2.5 transition-colors duration-150 ${
+                    i < arr.length - 1 ? 'border-b border-border' : ''
+                  } ${day.type === 'workout' ? 'cursor-pointer hover:bg-secondary/5' : ''} ${
+                    day.isToday ? 'bg-secondary/8' : ''
+                  }`}
+                >
+                  <span className={`text-xs font-mono w-7 ${day.isToday ? 'text-accent font-medium' : 'text-textMuted'}`}>
+                    {day.dayOfWeek.substring(0, 3).toUpperCase()}
+                  </span>
+                  <span className="text-base">{WEEK_ICONS[day.type]}</span>
+                  <span className={`text-sm flex-1 ${day.isToday ? 'text-accent' : 'text-textMuted'}`}>
+                    {day.type === 'workout'
+                      ? t(day.workoutNameKey ?? '')
+                      : day.type === 'sport'
+                        ? `Sport · ${profile.sport_name || ''}`
+                        : day.type === 'cardio'
+                          ? 'Cardio'
+                          : 'Rest'}
+                  </span>
+                  {day.isToday && <span className="text-[10px] text-accent font-mono tracking-wider">TODAY</span>}
+                  {day.type === 'workout' && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-3.5 h-3.5 text-textMuted">
+                      <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                  )}
+                </div>
+              ))}
+            </Card>
+          </motion.div>
+        )}
+
         {/* Morning decompression */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -278,5 +353,6 @@ export function Home() {
         onComplete={() => setDecompressionDone(true)}
       />
     </Layout>
+    </>
   )
 }

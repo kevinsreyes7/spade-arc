@@ -9,6 +9,9 @@
     "schedule": "Horario",
     "progress": "Progreso",
     "community": "Comunidad",
+    "train": "Entrenar",
+    "nutrition": "Nutrición",
+    "library": "Biblioteca",
     "profile": "Perfil"
   },
   "onboarding": {
