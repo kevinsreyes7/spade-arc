@@ -29,16 +29,19 @@ export function DecompressionSheet({ visible, type, onClose, onComplete }: Decom
   }
 
   const handleDone = async () => {
-    if (!user) return
     setSaving(true)
-    await supabase.from('decompression_logs').insert({
-      user_id: user.id,
-      date: new Date().toISOString().split('T')[0],
-      type,
-      items_completed: Array.from(checked),
-      completed_at: new Date().toISOString(),
-    })
+    // Best-effort save — don't block UI on Supabase success
+    if (user) {
+      await supabase.from('decompression_logs').insert({
+        user_id: user.id,
+        date: new Date().toISOString().split('T')[0],
+        type,
+        items_completed: Array.from(checked),
+        completed_at: new Date().toISOString(),
+      })
+    }
     setSaving(false)
+    setChecked(new Set())
     onComplete()
     onClose()
   }

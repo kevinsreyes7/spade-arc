@@ -63,19 +63,29 @@ export function Progress() {
       .order('date', { ascending: true })
       .then(({ data }) => { if (data) setMeasurements(data as BodyMeasurement[]) })
 
-    // Load key lift data
+    // Load key lift data — RLS handles user filtering via session ownership
     Promise.all(KEY_LIFTS.map(async (lift) => {
       const { data } = await supabase
         .from('exercise_logs')
         .select('weight, workout_sessions!inner(date)')
         .eq('exercise_name', lift.key)
-        .eq('workout_sessions.user_id', user.id)
+        .eq('completed', true)
         .not('weight', 'is', null)
-        .order('workout_sessions(date)', { ascending: true })
-      return { key: lift.key, data: (data ?? []).map((d: { weight: number; workout_sessions: { date: string }[] | { date: string } }) => ({
-        date: Array.isArray(d.workout_sessions) ? d.workout_sessions[0]?.date ?? '' : (d.workout_sessions as { date: string })?.date ?? '',
-        weight: d.weight,
-      })) }
+
+      // Take max weight per session date to get a clean progression line
+      const byDate: Record<string, number> = {}
+      ;(data ?? []).forEach((d: { weight: number; workout_sessions: { date: string } | Array<{ date: string }> }) => {
+        const ws = d.workout_sessions
+        const date = Array.isArray(ws) ? ws[0]?.date : ws?.date
+        if (!date) return
+        if (!byDate[date] || d.weight > byDate[date]) byDate[date] = d.weight
+      })
+
+      const points: LiftData[] = Object.entries(byDate)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([date, weight]) => ({ date, weight }))
+
+      return { key: lift.key, data: points }
     })).then((results) => {
       const map: Record<string, LiftData[]> = {}
       results.forEach((r) => { map[r.key] = r.data })

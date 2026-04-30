@@ -13,6 +13,7 @@ import { Paywall } from '@/pages/Paywall'
 import { Nutrition } from '@/pages/Nutrition'
 import { Library } from '@/pages/Library'
 import { ArticleReader } from '@/pages/ArticleReader'
+import { Restore } from '@/pages/Restore'
 import { useAuthContext } from '@/context/AuthContext'
 
 function AppRoutes() {
@@ -47,6 +48,7 @@ function AppRoutes() {
       <Route path="/nutrition" element={<AuthGuard><Nutrition /></AuthGuard>} />
       <Route path="/library" element={<AuthGuard><Library /></AuthGuard>} />
       <Route path="/library/:id" element={<AuthGuard><ArticleReader /></AuthGuard>} />
+      <Route path="/restore" element={<AuthGuard><Restore /></AuthGuard>} />
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />

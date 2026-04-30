@@ -10,9 +10,10 @@ interface SetRowProps {
   onChange: (updates: Partial<ActiveSet>) => void
   onComplete: () => void
   isTimeBased?: boolean
+  previousSet?: { weight: number | null; reps: number | null } | null
 }
 
-export function SetRow({ set, unitLabel, onChange, onComplete, isTimeBased = false }: SetRowProps) {
+export function SetRow({ set, unitLabel, onChange, onComplete, isTimeBased = false, previousSet }: SetRowProps) {
   const { t } = useTranslation()
   const [showNotes, setShowNotes] = useState(false)
 
@@ -104,6 +105,13 @@ export function SetRow({ set, unitLabel, onChange, onComplete, isTimeBased = fal
           </svg>
         </button>
       </div>
+
+      {/* Previous session hint */}
+      {previousSet && previousSet.weight != null && (
+        <p className="px-3 pb-1 text-[10px] font-mono text-textMuted/50">
+          Last session: {previousSet.weight}{unitLabel} × {previousSet.reps ?? '—'}
+        </p>
+      )}
 
       <AnimatePresence>
         {showNotes && (

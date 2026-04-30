@@ -211,9 +211,25 @@ BEGIN
 END;
 $$;
 
+-- ─── FOOD LOGS ──────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS food_logs (
+  id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id     UUID NOT NULL REFERENCES auth.users ON DELETE CASCADE,
+  date        DATE NOT NULL,
+  meal_type   TEXT NOT NULL,
+  description TEXT NOT NULL,
+  calories    INTEGER,
+  protein     NUMERIC,
+  created_at  TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE food_logs ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can manage own food logs" ON food_logs FOR ALL USING (auth.uid() = user_id);
+
 -- ─── INDEXES ────────────────────────────────
 CREATE INDEX IF NOT EXISTS idx_workout_sessions_user_date ON workout_sessions (user_id, date DESC);
 CREATE INDEX IF NOT EXISTS idx_exercise_logs_session ON exercise_logs (session_id);
 CREATE INDEX IF NOT EXISTS idx_body_measurements_user_date ON body_measurements (user_id, date DESC);
 CREATE INDEX IF NOT EXISTS idx_pr_shares_shared_at ON pr_shares (shared_at DESC);
 CREATE INDEX IF NOT EXISTS idx_decompression_logs_user_date ON decompression_logs (user_id, date DESC);
+CREATE INDEX IF NOT EXISTS idx_food_logs_user_date ON food_logs (user_id, date DESC);

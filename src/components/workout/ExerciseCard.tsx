@@ -15,6 +15,7 @@ interface ExerciseCardProps {
   onCompleteSet: (setIndex: number) => void
   onSubstitute: (substituteIndex: number) => void
   isActive?: boolean
+  previousSets?: Array<{ weight: number | null; reps: number | null } | null>
 }
 
 export function ExerciseCard({
@@ -26,6 +27,7 @@ export function ExerciseCard({
   onCompleteSet,
   onSubstitute,
   isActive = true,
+  previousSets,
 }: ExerciseCardProps) {
   const { t } = useTranslation()
   const [showWhy, setShowWhy] = useState(false)
@@ -163,6 +165,7 @@ export function ExerciseCard({
                 isTimeBased={exercise.isTimeBased}
                 onChange={(updates) => onUpdateSet(i, updates as Record<string, string | number | boolean>)}
                 onComplete={() => onCompleteSet(i)}
+                previousSet={previousSets?.[i] ?? null}
               />
             ))}
           </div>

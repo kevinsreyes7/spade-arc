@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { DecompressionSheet } from '@/components/DecompressionSheet'
 import { getPhaseFromWeek, getPhaseName } from '@/data/workouts'
-import { morningProtocol, dailyQuotes } from '@/data/protocols'
+import { dailyQuotes } from '@/data/protocols'
 import { getTodayWorkout, getNutritionTargets, buildWeekSchedule } from '@/hooks/useWorkoutSchedule'
 import { supabase } from '@/lib/supabase'
 import { MatrixRain } from '@/components/MatrixRain'
@@ -25,8 +25,10 @@ export function Home() {
   const { profile } = useProfile()
   const [streak, setStreak] = useState(0)
   const [totalSessions, setTotalSessions] = useState(0)
-  const [decompressionDone, setDecompressionDone] = useState(false)
+  const [morningDone, setMorningDone] = useState(false)
+  const [nightDone, setNightDone] = useState(false)
   const [showDecompression, setShowDecompression] = useState(false)
+  const [showNightDecompression, setShowNightDecompression] = useState(false)
   const quote = dailyQuotes[new Date().getDate() % dailyQuotes.length]
 
   const currentWeek = profile?.current_week ?? 1
@@ -55,14 +57,15 @@ export function Home() {
         setStreak(s)
       })
 
-    // Check decompression
+    // Check both decompression types
     supabase.from('decompression_logs')
-      .select('id')
+      .select('type')
       .eq('user_id', user.id)
       .eq('date', today)
-      .eq('type', 'morning')
       .then(({ data }) => {
-        if (data && data.length > 0) setDecompressionDone(true)
+        if (!data) return
+        setMorningDone(data.some((d) => d.type === 'morning'))
+        setNightDone(data.some((d) => d.type === 'night'))
       })
   }, [user, location.key])
 
@@ -268,31 +271,64 @@ export function Home() {
           </motion.div>
         )}
 
-        {/* Morning decompression */}
+        {/* Decompression — morning + night status */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
           className="mb-4"
         >
-          <Card hover={!decompressionDone} onClick={!decompressionDone ? () => setShowDecompression(true) : undefined}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">🌅</span>
-                <div>
-                  <p className="text-textPrimary font-medium text-sm">{t('home.decompression')}</p>
-                  <p className="text-xs text-textMuted">
-                    {morningProtocol.length} steps · 15 min
-                  </p>
-                </div>
+          <Card hover onClick={() => navigate('/restore')}>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">🌿</span>
+                <p className="text-textPrimary font-medium text-sm">{t('home.decompression')}</p>
               </div>
-              {decompressionDone ? (
-                <Badge variant="success">✓ {t('home.decompressionComplete')}</Badge>
-              ) : (
-                <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); setShowDecompression(true) }}>
-                  {t('home.decompressionStart')}
-                </Button>
-              )}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4 text-textMuted">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {/* Morning */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  if (!morningDone) setShowDecompression(true)
+                }}
+                className={`flex items-center gap-2 px-3 py-2 rounded-xl border transition-all text-sm ${
+                  morningDone
+                    ? 'bg-success/10 border-success/30 text-success'
+                    : 'border-border text-textMuted hover:border-accent'
+                }`}
+              >
+                <span>🌅</span>
+                <span className="text-xs font-medium">Morning</span>
+                {morningDone && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} className="w-3.5 h-3.5 ml-auto">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                )}
+              </button>
+              {/* Night */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  if (!nightDone) setShowNightDecompression(true)
+                }}
+                className={`flex items-center gap-2 px-3 py-2 rounded-xl border transition-all text-sm ${
+                  nightDone
+                    ? 'bg-success/10 border-success/30 text-success'
+                    : 'border-border text-textMuted hover:border-accent'
+                }`}
+              >
+                <span>🌙</span>
+                <span className="text-xs font-medium">Night</span>
+                {nightDone && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} className="w-3.5 h-3.5 ml-auto">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                )}
+              </button>
             </div>
           </Card>
         </motion.div>
@@ -350,7 +386,13 @@ export function Home() {
         visible={showDecompression}
         type="morning"
         onClose={() => setShowDecompression(false)}
-        onComplete={() => setDecompressionDone(true)}
+        onComplete={() => setMorningDone(true)}
+      />
+      <DecompressionSheet
+        visible={showNightDecompression}
+        type="night"
+        onClose={() => setShowNightDecompression(false)}
+        onComplete={() => setNightDone(true)}
       />
     </Layout>
     </>

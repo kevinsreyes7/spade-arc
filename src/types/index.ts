@@ -74,6 +74,17 @@ export interface BodyMeasurement {
   calf_right: number | null
 }
 
+export interface FoodLog {
+  id: string
+  user_id: string
+  date: string
+  meal_type: string
+  description: string
+  calories: number | null
+  protein: number | null
+  created_at: string
+}
+
 export interface CardioLog {
   id: string
   user_id: string

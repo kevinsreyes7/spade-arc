@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useProfile } from '@/context/ProfileContext'
 import { useAuthContext } from '@/context/AuthContext'
 import { Layout } from '@/components/layout/Layout'
 import { Card } from '@/components/ui/Card'
+import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
 import { getPhaseFromWeek, getPhaseName } from '@/data/workouts'
 import { supabase } from '@/lib/supabase'
+import type { FoodLog } from '@/types'
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -18,7 +21,6 @@ function calcTargets(weightKg: number, phase: number) {
   const isLeanBulk = phase <= 2
   const calories = Math.round(lbs * (isLeanBulk ? 17 : 14))
   const protein = Math.round(lbs)
-  // Training day default: 35% C / 25% F of total cals
   const carbs = Math.round((calories * 0.35) / 4)
   const fat = Math.round((calories * 0.25) / 9)
   return { calories, protein, carbs, fat }
@@ -32,7 +34,7 @@ function carbCyclingMacros(calories: number, proteinPct: number, carbPct: number
   }
 }
 
-// ─── Supplement list ─────────────────────────────────────────────────────────
+// ─── Constants ───────────────────────────────────────────────────────────────
 
 const SUPPLEMENTS = [
   { key: 'creatine', label: 'Creatine Monohydrate 5g', timing: '' },
@@ -41,8 +43,6 @@ const SUPPLEMENTS = [
   { key: 'magnesium', label: 'Magnesium Glycinate 400mg', timing: 'Take at night' },
   { key: 'omega3', label: 'Omega-3 2–3g', timing: '' },
 ]
-
-// ─── Meal plans ──────────────────────────────────────────────────────────────
 
 const MEAL_PLANS = {
   training: [
@@ -72,40 +72,23 @@ const MEAL_PLANS = {
   ],
 }
 
-// ─── Timing guide ────────────────────────────────────────────────────────────
-
 const TIMING = [
-  {
-    time: 'Morning',
-    sub: 'Within 60 min of waking',
-    desc: '40–50g protein',
-    examples: 'Eggs · Greek yogurt · whey shake',
-    icon: '☀️',
-  },
-  {
-    time: 'Pre-Workout',
-    sub: '60–90 min before',
-    desc: 'Complex carbs + protein',
-    examples: 'Oats + chicken · rice + eggs',
-    icon: '⚡',
-  },
-  {
-    time: 'Post-Workout',
-    sub: 'Within 45 min',
-    desc: 'Fast protein + simple carbs',
-    examples: 'Whey + banana · rice + lean meat',
-    icon: '🔥',
-  },
-  {
-    time: 'Before Sleep',
-    sub: 'Last meal of the day',
-    desc: 'Slow-release protein',
-    examples: 'Casein · Greek yogurt · cottage cheese',
-    icon: '🌙',
-  },
+  { time: 'Morning', sub: 'Within 60 min of waking', desc: '40–50g protein', examples: 'Eggs · Greek yogurt · whey shake', icon: '☀️' },
+  { time: 'Pre-Workout', sub: '60–90 min before', desc: 'Complex carbs + protein', examples: 'Oats + chicken · rice + eggs', icon: '⚡' },
+  { time: 'Post-Workout', sub: 'Within 45 min', desc: 'Fast protein + simple carbs', examples: 'Whey + banana · rice + lean meat', icon: '🔥' },
+  { time: 'Before Sleep', sub: 'Last meal of the day', desc: 'Slow-release protein', examples: 'Casein · Greek yogurt · cottage cheese', icon: '🌙' },
 ]
 
+const MEAL_TYPES = ['Breakfast', 'Snack', 'Lunch', 'Pre-workout', 'Post-workout', 'Dinner', 'Before bed'] as const
+type MealType = typeof MEAL_TYPES[number]
 type MealTab = 'training' | 'rest' | 'leg'
+
+interface FoodEntry {
+  meal_type: MealType
+  description: string
+  calories: string
+  protein: string
+}
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
@@ -116,6 +99,17 @@ export function Nutrition() {
   const [taken, setTaken] = useState<Set<string>>(new Set())
   const [suppLoading, setSuppLoading] = useState(false)
 
+  // Food log state
+  const [foodLogs, setFoodLogs] = useState<FoodLog[]>([])
+  const [showFoodForm, setShowFoodForm] = useState(false)
+  const [savingFood, setSavingFood] = useState(false)
+  const [foodEntry, setFoodEntry] = useState<FoodEntry>({
+    meal_type: 'Breakfast',
+    description: '',
+    calories: '',
+    protein: '',
+  })
+
   const week = profile?.current_week ?? 1
   const phase = getPhaseFromWeek(week)
   const weightKg = profile?.weight_kg ?? 80
@@ -124,43 +118,71 @@ export function Nutrition() {
 
   const trainingMacros = carbCyclingMacros(calories, 0.4, 0.35, 0.25)
   const restMacros = carbCyclingMacros(calories, 0.4, 0.25, 0.35)
+  const phaseName = getPhaseName(phase)
 
-  // Load today's supplement logs
+  const today = new Date().toISOString().split('T')[0]
+
+  // Load supplements and food logs for today
   useEffect(() => {
     if (!user) return
-    const today = new Date().toISOString().split('T')[0]
-    supabase
-      .from('supplement_logs')
-      .select('supplement')
-      .eq('user_id', user.id)
-      .eq('date', today)
+
+    supabase.from('supplement_logs').select('supplement').eq('user_id', user.id).eq('date', today)
       .then(({ data }) => {
         if (data) setTaken(new Set(data.map((d: { supplement: string }) => d.supplement)))
+      })
+
+    supabase.from('food_logs').select('*').eq('user_id', user.id).eq('date', today)
+      .order('created_at', { ascending: true })
+      .then(({ data }) => {
+        if (data) setFoodLogs(data as FoodLog[])
       })
   }, [user])
 
   const toggleSupplement = async (key: string) => {
     if (!user || suppLoading) return
     setSuppLoading(true)
-    const today = new Date().toISOString().split('T')[0]
     if (taken.has(key)) {
-      await supabase
-        .from('supplement_logs')
-        .delete()
-        .eq('user_id', user.id)
-        .eq('date', today)
-        .eq('supplement', key)
+      await supabase.from('supplement_logs').delete().eq('user_id', user.id).eq('date', today).eq('supplement', key)
       setTaken(prev => { const n = new Set(prev); n.delete(key); return n })
     } else {
-      await supabase
-        .from('supplement_logs')
-        .insert({ user_id: user.id, date: today, supplement: key })
+      await supabase.from('supplement_logs').insert({ user_id: user.id, date: today, supplement: key })
       setTaken(prev => new Set([...prev, key]))
     }
     setSuppLoading(false)
   }
 
-  const phaseName = getPhaseName(phase)
+  const saveFoodLog = async () => {
+    if (!user || !foodEntry.description.trim()) return
+    setSavingFood(true)
+    const { data } = await supabase.from('food_logs').insert({
+      user_id: user.id,
+      date: today,
+      meal_type: foodEntry.meal_type,
+      description: foodEntry.description.trim(),
+      calories: foodEntry.calories ? parseInt(foodEntry.calories) : null,
+      protein: foodEntry.protein ? parseFloat(foodEntry.protein) : null,
+    }).select().single()
+    if (data) setFoodLogs(prev => [...prev, data as FoodLog])
+    setFoodEntry({ meal_type: 'Breakfast', description: '', calories: '', protein: '' })
+    setShowFoodForm(false)
+    setSavingFood(false)
+  }
+
+  const deleteFoodLog = async (id: string) => {
+    await supabase.from('food_logs').delete().eq('id', id)
+    setFoodLogs(prev => prev.filter(l => l.id !== id))
+  }
+
+  // Food totals
+  const totalFoodCalories = foodLogs.reduce((s, l) => s + (l.calories ?? 0), 0)
+  const totalFoodProtein = foodLogs.reduce((s, l) => s + (l.protein ?? 0), 0)
+
+  // Group by meal type (only show types that have entries)
+  const groupedLogs = MEAL_TYPES.reduce((acc, meal) => {
+    const entries = foodLogs.filter(l => l.meal_type === meal)
+    if (entries.length) acc[meal] = entries
+    return acc
+  }, {} as Record<string, FoodLog[]>)
 
   return (
     <Layout>
@@ -182,17 +204,10 @@ export function Nutrition() {
               { label: 'Carbs', value: targets.carbs, unit: 'g', accent: false },
               { label: 'Fats', value: targets.fat, unit: 'g', accent: false },
             ].map((item) => (
-              <motion.div
-                key={item.label}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.35 }}
-              >
+              <motion.div key={item.label} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.35 }}>
                 <Card className={item.accent ? 'border-accent/30' : ''}>
                   <p className="text-textMuted text-xs tracking-widest uppercase mb-1">{item.label}</p>
-                  <p className={`font-display text-4xl ${item.accent ? 'text-accent' : 'text-textPrimary'}`}>
-                    {item.value}
-                  </p>
+                  <p className={`font-display text-4xl ${item.accent ? 'text-accent' : 'text-textPrimary'}`}>{item.value}</p>
                   <p className="text-textMuted text-xs">{item.unit}</p>
                 </Card>
               </motion.div>
@@ -206,12 +221,161 @@ export function Nutrition() {
           </p>
         </section>
 
+        {/* ── Food Diary ── */}
+        <section>
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-xs text-textMuted tracking-widest uppercase">Today's Food Log</p>
+            <Button size="sm" variant="outline" onClick={() => setShowFoodForm((p) => !p)}>
+              {showFoodForm ? 'Cancel' : '+ Log Food'}
+            </Button>
+          </div>
+
+          {/* Log form */}
+          <AnimatePresence>
+            {showFoodForm && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="overflow-hidden mb-3"
+              >
+                <Card>
+                  {/* Meal type selector */}
+                  <p className="text-xs text-textMuted uppercase tracking-widest mb-2">Meal Type</p>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {MEAL_TYPES.map((mt) => (
+                      <button
+                        key={mt}
+                        onClick={() => setFoodEntry((p) => ({ ...p, meal_type: mt }))}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                          foodEntry.meal_type === mt
+                            ? 'bg-accent/15 border-accent text-accent'
+                            : 'border-border text-textMuted'
+                        }`}
+                      >
+                        {mt}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Description */}
+                  <div className="mb-3">
+                    <p className="text-xs text-textMuted uppercase tracking-widest mb-1.5">What did you eat?</p>
+                    <textarea
+                      rows={2}
+                      placeholder="e.g. 200g chicken, white rice, broccoli..."
+                      value={foodEntry.description}
+                      onChange={(e) => setFoodEntry((p) => ({ ...p, description: e.target.value }))}
+                      className="w-full bg-bg/60 border border-border/60 rounded-xl px-3 py-2.5 text-sm text-textPrimary placeholder:text-textMuted/40 focus:outline-none focus:border-accent resize-none"
+                    />
+                  </div>
+
+                  {/* Optional macros */}
+                  <div className="grid grid-cols-2 gap-3 mb-4">
+                    <Input
+                      label="Calories (optional)"
+                      type="number"
+                      inputMode="numeric"
+                      placeholder="e.g. 450"
+                      value={foodEntry.calories}
+                      onChange={(e) => setFoodEntry((p) => ({ ...p, calories: e.target.value }))}
+                    />
+                    <Input
+                      label="Protein g (optional)"
+                      type="number"
+                      inputMode="decimal"
+                      placeholder="e.g. 42"
+                      value={foodEntry.protein}
+                      onChange={(e) => setFoodEntry((p) => ({ ...p, protein: e.target.value }))}
+                    />
+                  </div>
+
+                  <Button size="md" fullWidth loading={savingFood} onClick={saveFoodLog}
+                    disabled={!foodEntry.description.trim()}>
+                    Save Entry
+                  </Button>
+                </Card>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Totals vs target */}
+          {foodLogs.length > 0 && (
+            <div className="grid grid-cols-2 gap-3 mb-3">
+              <Card className={totalFoodCalories >= targets.calories * 0.9 ? 'border-success/30' : 'border-border'}>
+                <p className="text-[10px] text-textMuted uppercase tracking-widest mb-1">Calories Logged</p>
+                <p className="font-mono text-xl text-textPrimary">{totalFoodCalories}</p>
+                <p className="text-[10px] text-textMuted">/ {targets.calories} target</p>
+                <div className="mt-2 h-1 bg-border rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-accent rounded-full transition-all"
+                    style={{ width: `${Math.min((totalFoodCalories / targets.calories) * 100, 100)}%` }}
+                  />
+                </div>
+              </Card>
+              <Card className={totalFoodProtein >= targets.protein * 0.9 ? 'border-success/30' : 'border-border'}>
+                <p className="text-[10px] text-textMuted uppercase tracking-widest mb-1">Protein Logged</p>
+                <p className="font-mono text-xl text-textPrimary">{Math.round(totalFoodProtein)}g</p>
+                <p className="text-[10px] text-textMuted">/ {targets.protein}g target</p>
+                <div className="mt-2 h-1 bg-border rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-secondary rounded-full transition-all"
+                    style={{ width: `${Math.min((totalFoodProtein / targets.protein) * 100, 100)}%` }}
+                  />
+                </div>
+              </Card>
+            </div>
+          )}
+
+          {/* Today's logs grouped by meal type */}
+          {foodLogs.length === 0 ? (
+            <Card>
+              <p className="text-textMuted text-sm text-center py-4">No food logged today. Tap "+ Log Food" to start.</p>
+            </Card>
+          ) : (
+            <Card padding="none">
+              {Object.entries(groupedLogs).map(([mealType, entries], gi) => (
+                <div key={mealType} className={gi < Object.keys(groupedLogs).length - 1 ? 'border-b border-border' : ''}>
+                  <p className="px-4 pt-3 pb-1 text-xs text-accent font-medium uppercase tracking-widest">{mealType}</p>
+                  {entries.map((entry, ei) => (
+                    <div
+                      key={entry.id}
+                      className={`flex items-start gap-3 px-4 py-2.5 ${ei < entries.length - 1 ? 'border-b border-border/40' : ''}`}
+                    >
+                      <div className="flex-1 min-w-0">
+                        <p className="text-textPrimary text-sm leading-snug">{entry.description}</p>
+                        {(entry.calories != null || entry.protein != null) && (
+                          <p className="text-xs text-textMuted/70 mt-0.5 font-mono">
+                            {entry.calories != null ? `${entry.calories} kcal` : ''}
+                            {entry.calories != null && entry.protein != null ? ' · ' : ''}
+                            {entry.protein != null ? `${entry.protein}g protein` : ''}
+                          </p>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => deleteFoodLog(entry.id)}
+                        className="text-textMuted/40 hover:text-danger transition-colors shrink-0 p-1"
+                        aria-label="Delete entry"
+                      >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4">
+                          <polyline points="3 6 5 6 21 6" />
+                          <path d="M19 6l-1 14H6L5 6" />
+                          <path d="M10 11v6M14 11v6" />
+                          <path d="M9 6V4h6v2" />
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </Card>
+          )}
+        </section>
+
         {/* ── Carb Cycling Guide ── */}
         <section>
           <p className="text-xs text-textMuted tracking-widest uppercase mb-3">Carb Cycling Guide</p>
           <div className="space-y-3">
-
-            {/* Training day */}
             <Card className="border-secondary/30">
               <div className="flex items-center justify-between mb-2">
                 <div>
@@ -235,7 +399,6 @@ export function Nutrition() {
               </div>
             </Card>
 
-            {/* Rest day */}
             <Card className="border-border">
               <div className="flex items-center justify-between mb-2">
                 <div>
@@ -259,7 +422,6 @@ export function Nutrition() {
               </div>
             </Card>
 
-            {/* Leg day */}
             <Card className="border-phase4/30">
               <div className="flex items-center justify-between mb-2">
                 <div>
@@ -269,7 +431,7 @@ export function Nutrition() {
                 <span className="text-lg">🦵</span>
               </div>
               <p className="text-textMuted text-sm leading-relaxed">
-                Legs are your biggest muscle group and consume the most glycogen. Eating your highest carb intake on leg day fuels the session, accelerates recovery, and maximises the anabolic response to the heaviest volume of the week. Add an extra 20–30g carbs above your normal training day target.
+                Legs are your biggest muscle group and consume the most glycogen. Eating your highest carb intake on leg day fuels the session, accelerates recovery, and maximises the anabolic response. Add an extra 20–30g carbs above your normal training day target.
               </p>
             </Card>
           </div>
@@ -279,23 +441,18 @@ export function Nutrition() {
         <section>
           <p className="text-xs text-textMuted tracking-widest uppercase mb-3">Meal Timing</p>
           <div className="space-y-2">
-            {TIMING.map((t, i) => (
-              <motion.div
-                key={t.time}
-                initial={{ opacity: 0, x: -12 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.07 }}
-              >
+            {TIMING.map((item, i) => (
+              <motion.div key={item.time} initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.07 }}>
                 <Card>
                   <div className="flex gap-3 items-start">
-                    <span className="text-2xl">{t.icon}</span>
+                    <span className="text-2xl">{item.icon}</span>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-baseline gap-2">
-                        <p className="text-textPrimary text-sm font-medium">{t.time}</p>
-                        <p className="text-textMuted text-xs">{t.sub}</p>
+                        <p className="text-textPrimary text-sm font-medium">{item.time}</p>
+                        <p className="text-textMuted text-xs">{item.sub}</p>
                       </div>
-                      <p className="text-accent text-xs mt-0.5">{t.desc}</p>
-                      <p className="text-textMuted text-xs mt-0.5">{t.examples}</p>
+                      <p className="text-accent text-xs mt-0.5">{item.desc}</p>
+                      <p className="text-textMuted text-xs mt-0.5">{item.examples}</p>
                     </div>
                   </div>
                 </Card>
@@ -307,30 +464,22 @@ export function Nutrition() {
         {/* ── Meal Plan Suggestions ── */}
         <section>
           <p className="text-xs text-textMuted tracking-widest uppercase mb-3">Meal Plan Suggestions</p>
-
-          {/* Tabs */}
           <div className="flex gap-2 mb-4">
             {(['training', 'rest', 'leg'] as MealTab[]).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setMealTab(tab)}
                 className={`flex-1 py-2 rounded-xl text-xs font-medium tracking-wide transition-all duration-200 ${
-                  mealTab === tab
-                    ? 'bg-accent text-bg'
-                    : 'bg-card border border-border text-textMuted'
+                  mealTab === tab ? 'bg-accent text-bg' : 'bg-card border border-border text-textMuted'
                 }`}
               >
                 {tab === 'training' ? 'Training' : tab === 'rest' ? 'Rest' : 'Leg Day'}
               </button>
             ))}
           </div>
-
           <Card padding="none">
             {MEAL_PLANS[mealTab].map((meal, i) => (
-              <div
-                key={meal.time}
-                className={`flex gap-3 px-4 py-3 ${i < MEAL_PLANS[mealTab].length - 1 ? 'border-b border-border' : ''}`}
-              >
+              <div key={meal.time} className={`flex gap-3 px-4 py-3 ${i < MEAL_PLANS[mealTab].length - 1 ? 'border-b border-border' : ''}`}>
                 <span className="text-accent text-xs font-medium w-24 shrink-0 pt-0.5">{meal.time}</span>
                 <p className="text-textMuted text-sm leading-relaxed">{meal.items}</p>
               </div>
@@ -356,7 +505,6 @@ export function Nutrition() {
                     i < SUPPLEMENTS.length - 1 ? 'border-b border-border' : ''
                   } ${isTaken ? 'bg-success/5' : ''}`}
                 >
-                  {/* Checkbox */}
                   <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all duration-200 ${
                     isTaken ? 'bg-success border-success' : 'border-border'
                   }`}>
@@ -370,9 +518,7 @@ export function Nutrition() {
                     <p className={`text-sm font-medium transition-colors duration-200 ${isTaken ? 'text-success' : 'text-textPrimary'}`}>
                       {supp.label}
                     </p>
-                    {supp.timing && (
-                      <p className="text-textMuted text-xs mt-0.5">{supp.timing}</p>
-                    )}
+                    {supp.timing && <p className="text-textMuted text-xs mt-0.5">{supp.timing}</p>}
                   </div>
                 </motion.button>
               )
