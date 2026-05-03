@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import i18n from '@/i18n'
@@ -11,7 +11,56 @@ import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { redirectToPortal } from '@/lib/stripe'
+import { supabase } from '@/lib/supabase'
 import type { Equipment, Language, UnitPreference } from '@/types'
+
+interface Stats {
+  totalSessions: number | null
+  currentStreak: number | null
+  longestStreak: number | null
+  heaviestSquat: number | null
+  heaviestPullUp: number | null
+  heaviestRDL: number | null
+}
+
+function calculateStreaks(dates: string[]): { current: number; longest: number } {
+  if (!dates.length) return { current: 0, longest: 0 }
+  const unique = [...new Set(dates)].sort()
+  if (!unique.length) return { current: 0, longest: 0 }
+
+  const todayStr = new Date().toISOString().split('T')[0]
+  const yesterdayDate = new Date()
+  yesterdayDate.setDate(yesterdayDate.getDate() - 1)
+  const yesterdayStr = yesterdayDate.toISOString().split('T')[0]
+  const latest = unique[unique.length - 1]
+
+  let current = 0
+  if (latest === todayStr || latest === yesterdayStr) {
+    let check = latest
+    for (let i = unique.length - 1; i >= 0; i--) {
+      if (unique[i] === check) {
+        current++
+        const d = new Date(check + 'T00:00:00Z')
+        d.setUTCDate(d.getUTCDate() - 1)
+        check = d.toISOString().split('T')[0]
+      } else if (unique[i] < check) {
+        break
+      }
+    }
+  }
+
+  let longest = unique.length > 0 ? 1 : 0
+  let cur = 1
+  for (let i = 1; i < unique.length; i++) {
+    const diffDays = Math.round(
+      (new Date(unique[i] + 'T00:00:00Z').getTime() - new Date(unique[i - 1] + 'T00:00:00Z').getTime()) / 86400000
+    )
+    if (diffDays === 1) { cur++; if (cur > longest) longest = cur }
+    else cur = 1
+  }
+
+  return { current, longest }
+}
 
 const EQUIPMENT_LABELS: Record<Equipment, string> = {
   full_gym: 'Full Gym',
@@ -35,6 +84,54 @@ export function Profile() {
     height_cm: String(profile?.height_cm ?? ''),
   })
   const [saving, setSaving] = useState(false)
+  const [stats, setStats] = useState<Stats>({
+    totalSessions: null, currentStreak: null, longestStreak: null,
+    heaviestSquat: null, heaviestPullUp: null, heaviestRDL: null,
+  })
+
+  const unit = profile?.unit_preference === 'imperial' ? 'lbs' : 'kg'
+
+  useEffect(() => {
+    if (!user) return
+    const loadStats = async () => {
+      const { count } = await supabase
+        .from('workout_sessions')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .not('completed_at', 'is', null)
+
+      const { data: sessions } = await supabase
+        .from('workout_sessions')
+        .select('id, date')
+        .eq('user_id', user.id)
+        .not('completed_at', 'is', null)
+
+      const dates = sessions?.map((s) => s.date) ?? []
+      const { current, longest } = calculateStreaks(dates)
+      const sessionIds = sessions?.map((s) => s.id) ?? []
+
+      if (!sessionIds.length) {
+        setStats({ totalSessions: count ?? 0, currentStreak: current, longestStreak: longest, heaviestSquat: null, heaviestPullUp: null, heaviestRDL: null })
+        return
+      }
+
+      const [squat, pullup, rdl] = await Promise.all([
+        supabase.from('exercise_logs').select('weight').eq('exercise_name', 'Barbell Back Squat').eq('completed', true).not('weight', 'is', null).in('session_id', sessionIds).order('weight', { ascending: false }).limit(1),
+        supabase.from('exercise_logs').select('weight').eq('exercise_name', 'Weighted Pull-Up').eq('completed', true).not('weight', 'is', null).in('session_id', sessionIds).order('weight', { ascending: false }).limit(1),
+        supabase.from('exercise_logs').select('weight').eq('exercise_name', 'Romanian Deadlift').eq('completed', true).not('weight', 'is', null).in('session_id', sessionIds).order('weight', { ascending: false }).limit(1),
+      ])
+
+      setStats({
+        totalSessions: count ?? 0,
+        currentStreak: current,
+        longestStreak: longest,
+        heaviestSquat: squat.data?.[0]?.weight ?? null,
+        heaviestPullUp: pullup.data?.[0]?.weight ?? null,
+        heaviestRDL: rdl.data?.[0]?.weight ?? null,
+      })
+    }
+    loadStats()
+  }, [user])
 
   if (!profile) return null
 
@@ -216,12 +313,12 @@ export function Profile() {
             <p className="text-xs text-textMuted uppercase tracking-widest mb-3">{t('profile.stats.title')}</p>
             <div className="grid grid-cols-2 gap-3">
               {[
-                { label: t('profile.stats.totalSessions'), val: '—' },
-                { label: t('profile.stats.currentStreak'), val: '—' },
-                { label: t('profile.stats.longestStreak'), val: '—' },
-                { label: t('profile.stats.heaviestSquat'), val: '—' },
-                { label: t('profile.stats.heaviestPullUp'), val: '—' },
-                { label: t('profile.stats.heaviestRDL'), val: '—' },
+                { label: t('profile.stats.totalSessions'), val: stats.totalSessions !== null ? String(stats.totalSessions) : '—' },
+                { label: t('profile.stats.currentStreak'), val: stats.currentStreak !== null ? `${stats.currentStreak}d` : '—' },
+                { label: t('profile.stats.longestStreak'), val: stats.longestStreak !== null ? `${stats.longestStreak}d` : '—' },
+                { label: t('profile.stats.heaviestSquat'), val: stats.heaviestSquat !== null ? `${stats.heaviestSquat}${unit}` : '—' },
+                { label: t('profile.stats.heaviestPullUp'), val: stats.heaviestPullUp !== null ? `${stats.heaviestPullUp}${unit}` : '—' },
+                { label: t('profile.stats.heaviestRDL'), val: stats.heaviestRDL !== null ? `${stats.heaviestRDL}${unit}` : '—' },
               ].map((s) => (
                 <div key={s.label} className="bg-bg rounded-xl p-3">
                   <p className="font-mono text-xl text-accent">{s.val}</p>

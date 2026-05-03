@@ -63,34 +63,49 @@ export function Progress() {
       .order('date', { ascending: true })
       .then(({ data }) => { if (data) setMeasurements(data as BodyMeasurement[]) })
 
-    // Load key lift data — RLS handles user filtering via session ownership
-    Promise.all(KEY_LIFTS.map(async (lift) => {
-      const { data } = await supabase
-        .from('exercise_logs')
-        .select('weight, workout_sessions!inner(date)')
-        .eq('exercise_name', lift.key)
-        .eq('completed', true)
-        .not('weight', 'is', null)
+    // Two-step query: get session IDs for this user, then get lift data
+    const loadLifts = async () => {
+      const { data: sessions } = await supabase
+        .from('workout_sessions')
+        .select('id, date')
+        .eq('user_id', user.id)
 
-      // Take max weight per session date to get a clean progression line
-      const byDate: Record<string, number> = {}
-      ;(data ?? []).forEach((d: { weight: number; workout_sessions: { date: string } | Array<{ date: string }> }) => {
-        const ws = d.workout_sessions
-        const date = Array.isArray(ws) ? ws[0]?.date : ws?.date
-        if (!date) return
-        if (!byDate[date] || d.weight > byDate[date]) byDate[date] = d.weight
-      })
+      if (!sessions?.length) { setLiftData({}); return }
 
-      const points: LiftData[] = Object.entries(byDate)
-        .sort(([a], [b]) => a.localeCompare(b))
-        .map(([date, weight]) => ({ date, weight }))
+      const sessionIds = sessions.map((s) => s.id)
+      const sessionDateMap: Record<string, string> = {}
+      sessions.forEach((s) => { sessionDateMap[s.id] = s.date })
 
-      return { key: lift.key, data: points }
-    })).then((results) => {
+      const results = await Promise.all(KEY_LIFTS.map(async (lift) => {
+        const { data: logs } = await supabase
+          .from('exercise_logs')
+          .select('weight, session_id')
+          .eq('exercise_name', lift.key)
+          .eq('completed', true)
+          .not('weight', 'is', null)
+          .in('session_id', sessionIds)
+
+        const byDate: Record<string, number> = {}
+        ;(logs ?? []).forEach((d: { weight: number; session_id: string }) => {
+          const date = sessionDateMap[d.session_id]
+          if (!date) return
+          if (!byDate[date] || d.weight > byDate[date]) byDate[date] = d.weight
+        })
+
+        return {
+          key: lift.key,
+          data: Object.entries(byDate)
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([date, weight]) => ({ date, weight })),
+        }
+      }))
+
       const map: Record<string, LiftData[]> = {}
       results.forEach((r) => { map[r.key] = r.data })
       setLiftData(map)
-    })
+    }
+
+    loadLifts()
   }, [user])
 
   const saveMeasurements = async () => {

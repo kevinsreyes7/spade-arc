@@ -44,7 +44,7 @@ export function ExerciseCard({
   const allComplete = completedSets === activeExercise.sets.length
 
   const displayName = activeExercise.substitutedWith
-    ? activeExercise.substitutedWith
+    ? t(activeExercise.substitutedWith)
     : t(exercise.nameKey)
 
   return (
