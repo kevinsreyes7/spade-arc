@@ -169,6 +169,32 @@ export function Home() {
           </motion.div>
         </div>
 
+        {/* View Daily Report */}
+        <motion.div
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.13 }}
+          className="mb-4"
+        >
+          <button
+            onClick={() => navigate('/eodr')}
+            className="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-card border border-border hover:border-accent/40 hover:bg-accent/5 transition-all duration-200 group"
+          >
+            <div className="flex items-center gap-2.5">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="w-4 h-4 text-accent/70">
+                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+                <rect x="9" y="3" width="6" height="4" rx="1" />
+                <line x1="9" y1="12" x2="15" y2="12" />
+                <line x1="9" y1="16" x2="13" y2="16" />
+              </svg>
+              <span className="text-sm text-textMuted group-hover:text-textPrimary transition-colors">View Daily Report</span>
+            </div>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4 text-textMuted/40 group-hover:text-accent/60 transition-colors">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </button>
+        </motion.div>
+
         {/* Today's workout card */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -371,7 +397,6 @@ export function Home() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="mb-4"
         >
           <Card className="relative overflow-hidden">
             <div className="absolute top-0 left-0 w-1 h-full bg-accent/30 rounded-l-2xl" />
@@ -380,26 +405,6 @@ export function Home() {
               <p className="text-textMuted text-sm italic leading-relaxed">"{quote}"</p>
             </div>
           </Card>
-        </motion.div>
-
-        {/* View Daily Report */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.35 }}
-        >
-          <button
-            onClick={() => navigate('/eodr')}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border border-border text-textMuted text-sm hover:border-accent/40 hover:text-accent transition-all duration-200"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="w-4 h-4">
-              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
-              <rect x="9" y="3" width="6" height="4" rx="1" />
-              <line x1="9" y1="12" x2="15" y2="12" />
-              <line x1="9" y1="16" x2="13" y2="16" />
-            </svg>
-            View Daily Report
-          </button>
         </motion.div>
       </div>
 
