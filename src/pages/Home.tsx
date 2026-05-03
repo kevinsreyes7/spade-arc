@@ -371,6 +371,7 @@ export function Home() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
+          className="mb-4"
         >
           <Card className="relative overflow-hidden">
             <div className="absolute top-0 left-0 w-1 h-full bg-accent/30 rounded-l-2xl" />
@@ -379,6 +380,26 @@ export function Home() {
               <p className="text-textMuted text-sm italic leading-relaxed">"{quote}"</p>
             </div>
           </Card>
+        </motion.div>
+
+        {/* View Daily Report */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.35 }}
+        >
+          <button
+            onClick={() => navigate('/eodr')}
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border border-border text-textMuted text-sm hover:border-accent/40 hover:text-accent transition-all duration-200"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="w-4 h-4">
+              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+              <rect x="9" y="3" width="6" height="4" rx="1" />
+              <line x1="9" y1="12" x2="15" y2="12" />
+              <line x1="9" y1="16" x2="13" y2="16" />
+            </svg>
+            View Daily Report
+          </button>
         </motion.div>
       </div>
 
