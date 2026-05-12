@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0d1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>SPADE ARC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="app-header" id="app-header" style="display:none">
+  <div class="header-bar">
+    <div class="app-logo">SPADE <span>ARC</span></div>
+    <div class="header-right">
+      <span class="pro-badge" id="tier-badge">FREE</span>
+      <div class="user-menu">
+        <div class="user-avatar" id="user-avatar" onclick="toggleDropdown()">U</div>
+        <div class="user-dropdown" id="user-dropdown">
+          <div class="dropdown-label">Account</div>
+          <div class="dropdown-item" id="dropdown-email" style="font-size:12px;color:var(--muted)"></div>
+          <div class="dropdown-item" onclick="goToSettings()">⚙️ Settings</div>
+          <div class="dropdown-item danger" onclick="handleSignOut()">→ Sign Out</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <nav class="tab-scroll" id="tab-nav">
+    <button class="nav-tab active" data-page="dashboard">Dashboard</button>
+    <button class="nav-tab" data-page="today">Today</button>
+    <button class="nav-tab" data-page="coach">Coach</button>
+    <button class="nav-tab" data-page="workouts">Workouts</button>
+    <button class="nav-tab" data-page="measurements">Measurements</button>
+    <button class="nav-tab" data-page="whoop">WHOOP</button>
+    <button class="nav-tab" data-page="journal">Journal</button>
+    <button class="nav-tab" data-page="progress">Progress</button>
+    <button class="nav-tab" data-page="schedule">Schedule</button>
+    <button class="nav-tab" data-page="program">Program</button>
+  </nav>
+</header>
+
+<main id="main-content">
+
+<!-- PAGE: DASHBOARD -->
+<div id="page-dashboard" class="page active"></div>
+
+<!-- PAGE: TODAY -->
+<div id="page-today" class="page"></div>
+
+<!-- PAGE: COACH -->
+<div id="page-coach" class="page">
+  <div class="page-title">AI Coach</div>
+  <div class="page-subtitle">Powered by Claude · SPADE ARC system prompt</div>
+  <div id="coach-paywall"></div>
+  <div id="coach-chat" style="display:none">
+    <div class="chat-wrap">
+      <div class="chat-messages" id="chat-messages">
+        <div class="chat-msg">
+          <div class="chat-avatar ai">S</div>
+          <div class="chat-bubble">I'm your SPADE ARC coach. Ask me anything about your training, nutrition, recovery, or protocol. I have the full program loaded.<br><br>What do you need?</div>
+        </div>
+      </div>
+      <div class="chat-input-row">
+        <textarea class="chat-input" id="chat-input" placeholder="Ask your coach..." rows="1" onkeydown="chatKeydown(event)"></textarea>
+        <button class="chat-send" id="chat-send" onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: WORKOUTS -->
+<div id="page-workouts" class="page">
+  <div class="page-title">Workouts</div>
+  <div class="page-subtitle">Log sets, reps, weights · track progression</div>
+  <div id="workouts-paywall"></div>
+  <div id="workouts-content" style="display:none">
+    <div class="section-title">Phase</div>
+    <div class="sub-tabs" id="phase-tabs">
+      <button class="sub-tab active" data-phase="1">Phase I</button>
+      <button class="sub-tab" data-phase="2">Phase II</button>
+      <button class="sub-tab" data-phase="3">Phase III</button>
+      <button class="sub-tab" data-phase="4">Phase IV</button>
+    </div>
+    <div class="phase-banner" id="phase-banner"></div>
+    <div class="section-title">Day</div>
+    <div class="day-tabs" id="day-tabs">
+      <button class="day-tab active" data-day="mon">Mon</button>
+      <button class="day-tab" data-day="tue">Tue</button>
+      <button class="day-tab" data-day="wed">Wed</button>
+      <button class="day-tab" data-day="thu">Thu</button>
+      <button class="day-tab" data-day="fri">Fri</button>
+      <button class="day-tab" data-day="sat">Sat</button>
+      <button class="day-tab" data-day="sun">Sun</button>
+    </div>
+    <div id="workout-day-content"></div>
+  </div>
+</div>
+
+<!-- PAGE: MEASUREMENTS -->
+<div id="page-measurements" class="page">
+  <div class="page-title">Measurements</div>
+  <div class="page-subtitle">Track body composition over time</div>
+  <div id="measurements-paywall"></div>
+  <div id="measurements-content" style="display:none"></div>
+</div>
+
+<!-- PAGE: WHOOP -->
+<div id="page-whoop" class="page">
+  <div class="page-title">WHOOP</div>
+  <div class="page-subtitle">Daily recovery tracking · HRV · sleep quality</div>
+  <div id="whoop-content"></div>
+</div>
+
+<!-- PAGE: JOURNAL -->
+<div id="page-journal" class="page">
+  <div class="page-title">Journal</div>
+  <div class="page-subtitle">Reflect. Track. Build the mind.</div>
+  <div id="journal-paywall"></div>
+  <div id="journal-content" style="display:none"></div>
+</div>
+
+<!-- PAGE: PROGRESS -->
+<div id="page-progress" class="page">
+  <div class="page-title">Progress</div>
+  <div class="page-subtitle">All charts · trends · streaks</div>
+  <div id="progress-paywall"></div>
+  <div id="progress-content" style="display:none"></div>
+</div>
+
+<!-- PAGE: SCHEDULE -->
+<div id="page-schedule" class="page">
+  <div class="page-title">Schedule</div>
+  <div class="page-subtitle">20-week breakdown · phase overview</div>
+  <div id="schedule-content"></div>
+</div>
+
+<!-- PAGE: PROGRAM -->
+<div id="page-program" class="page">
+  <div class="page-title">Program</div>
+  <div class="page-subtitle">Full SPADE ARC protocol reference</div>
+  <div id="program-content"></div>
+</div>
+
+</main>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- SCRIPTS -->
+<script src="js/config.js"></script>
+<script src="js/data.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
