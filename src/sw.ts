@@ -6,6 +6,18 @@ declare const self: ServiceWorkerGlobalScope
 cleanupOutdatedCaches()
 precacheAndRoute(self.__WB_MANIFEST)
 
+// Force activate immediately — skip waiting so the new SW takes over right away
+self.addEventListener('install', () => self.skipWaiting())
+
+// On activation, delete ALL old caches so stale React app is wiped
+self.addEventListener('activate', (event: ExtendableEvent) => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.map(key => caches.delete(key)))
+    ).then(() => self.clients.claim())
+  )
+})
+
 self.addEventListener('push', (event: PushEvent) => {
   const data = event.data?.json() ?? {}
   event.waitUntil(
