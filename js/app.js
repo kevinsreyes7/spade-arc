@@ -1011,9 +1011,10 @@ async function renderProfile() {
         <div class="field"><label>WHOOP age</label><input type="number" id="m-whoopAge" step="0.1" value="${latest?.whoop_age??userProfile?.whoop_age??''}"></div>
       </div>
       <div class="field"><label>Notes</label><textarea id="m-notes" rows="2"></textarea></div>
+      <div id="m-error" style="display:none;background:rgba(192,57,43,.1);border:1px solid rgba(192,57,43,.3);border-radius:10px;color:var(--danger);font-size:13px;padding:10px 13px;margin-bottom:12px;line-height:1.5"></div>
       <div class="form-actions">
-        <button class="btn btn-sm" onclick="saveMeasurement()">Save</button>
-        <button class="btn btn-secondary btn-sm" onclick="navigateTo('stats')">View charts →</button>
+        <button class="btn btn-sm" id="m-save-btn" onclick="saveMeasurement()">Save</button>
+        <button class="btn btn-secondary btn-sm" onclick="navigateTo('stats')">View Stats →</button>
       </div>
     </div>
 
@@ -1034,9 +1035,14 @@ async function renderProfile() {
 }
 
 async function saveMeasurement() {
+  const saveBtn = document.getElementById('m-save-btn');
+  const errEl = document.getElementById('m-error');
+  if (saveBtn) { saveBtn.textContent = 'Saving...'; saveBtn.disabled = true; }
+  if (errEl) { errEl.style.display = 'none'; }
+
   const { error } = await sb.from('measurements').insert({
     user_id: currentUser.id,
-    date: document.getElementById('m-date').value,
+    date: document.getElementById('m-date')?.value || todayStr(),
     weight_lbs: numVal('m-weight'), height_cm: numVal('m-height'),
     body_fat_pct: numVal('m-bf'), shoulders_cm: numVal('m-shoulders'),
     waist_cm: numVal('m-waist'), chest_cm: numVal('m-chest'),
@@ -1044,12 +1050,22 @@ async function saveMeasurement() {
     right_arm_cm: numVal('m-rarm'), left_quad_cm: numVal('m-lquad'),
     right_quad_cm: numVal('m-rquad'), left_calf_cm: numVal('m-lcalf'),
     right_calf_cm: numVal('m-rcalf'), neck_cm: numVal('m-neck'),
-    whoop_age: numVal('m-whoopAge'), notes: document.getElementById('m-notes')?.value??'',
+    whoop_age: numVal('m-whoopAge'), notes: document.getElementById('m-notes')?.value ?? '',
   });
-  if (error) { toast('Error: '+error.message,'error'); return; }
+
+  if (error) {
+    const msg = error.message?.includes('relation') || error.message?.includes('does not exist')
+      ? 'Database tables not set up yet. Go to Supabase → SQL Editor and run the schema-v2.sql file.'
+      : 'Error: ' + error.message;
+    if (errEl) { errEl.textContent = msg; errEl.style.display = 'block'; }
+    if (saveBtn) { saveBtn.textContent = 'Save'; saveBtn.disabled = false; }
+    toast(msg, 'error');
+    return;
+  }
+
   const age = numVal('m-whoopAge');
-  if (age) await sb.from('profiles').update({whoop_age:age}).eq('id',currentUser.id);
-  toast('Saved!','success');
+  if (age) await sb.from('profiles').update({ whoop_age: age }).eq('id', currentUser.id);
+  toast('Measurements saved!', 'success');
   await renderProfile();
 }
 

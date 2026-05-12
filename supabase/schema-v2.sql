@@ -69,8 +69,9 @@ CREATE TABLE IF NOT EXISTS workout_logs (
   exercises       JSONB DEFAULT '[]',
   notes           TEXT,
   whoop_recovery  TEXT CHECK (whoop_recovery IN ('green','yellow','red')),
-  session_rating  INTEGER CHECK (session_rating BETWEEN 1 AND 5),
-  created_at      TIMESTAMPTZ DEFAULT NOW()
+  session_rating    INTEGER CHECK (session_rating BETWEEN 1 AND 5),
+  duration_minutes  INTEGER,
+  created_at        TIMESTAMPTZ DEFAULT NOW()
 );
 ALTER TABLE workout_logs ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users manage own workout_logs" ON workout_logs FOR ALL USING (auth.uid() = user_id);
