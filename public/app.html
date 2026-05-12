@@ -14,9 +14,6 @@
 <!-- MATRIX RAIN CANVAS (behind everything) -->
 <canvas id="matrix-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;display:none"></canvas>
 
-<!-- BULLET ANIMATION CANVAS (overlay on transitions) -->
-<canvas id="bullet-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:9990;pointer-events:none;display:none"></canvas>
-
 <!-- PAGE CONTENT WRAPPER -->
 <div id="app-wrap" style="position:relative;z-index:1">
 
@@ -135,42 +132,46 @@
 </nav>
 
 <!-- FLOATING COACH BUTTON -->
+</div><!-- end app-wrap -->
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- COACH FAB + PANEL — outside app-wrap for correct z-index -->
 <div id="coach-fab" style="display:none">
-  <button class="fab-btn" onclick="toggleCoachPanel()" title="AI Coach">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <button class="fab-btn" onclick="toggleCoachPanel()" id="fab-btn" title="AI Coach">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
     </svg>
   </button>
 </div>
 
-<!-- COACH SLIDE-UP PANEL -->
+<div class="coach-backdrop" id="coach-backdrop" onclick="closeCoachPanel()"></div>
+
 <div id="coach-panel" class="coach-panel">
   <div class="coach-panel-drag" onclick="closeCoachPanel()"></div>
   <div class="coach-panel-header">
     <div>
-      <div style="font-size:16px;font-weight:700">AI Coach</div>
-      <div style="font-size:11px;color:var(--text3);margin-top:2px">Powered by Claude · SPADE ARC</div>
+      <div style="font-size:16px;font-weight:700;color:var(--accent)">AI Coach</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:2px">Powered by Claude · SPADE ARC system</div>
     </div>
     <button class="coach-close" onclick="closeCoachPanel()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
   </div>
   <div class="chat-messages" id="chat-messages">
     <div class="chat-msg">
-      <div class="chat-avatar ai">S</div>
-      <div class="chat-bubble">I'm your SPADE ARC coach. Ask me anything about training, nutrition, recovery, or protocol.</div>
+      <div class="chat-avatar ai">♠</div>
+      <div class="chat-bubble">I'm your SPADE ARC coach. Ask me anything about your training, nutrition, recovery, or protocol.</div>
     </div>
   </div>
   <div class="chat-input-row">
     <textarea class="chat-input" id="chat-input" placeholder="Ask your coach..." rows="1" onkeydown="chatKeydown(event)"></textarea>
-    <button class="chat-send" id="chat-send" onclick="sendMessage()">↑</button>
+    <button class="chat-send" id="chat-send" onclick="sendMessage()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+    </button>
   </div>
 </div>
-
-</div><!-- end app-wrap -->
-
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
 
 <script src="/js/config.js"></script>
 <script src="/js/data.js"></script>

@@ -57,8 +57,7 @@ async function init() {
     });
   });
 
-  // Initial page load with bullet animation
-  await navigateTo('dashboard', true);
+  await showPage('dashboard');
 }
 
 async function loadProfile() {
@@ -79,14 +78,8 @@ function updateTierBadge() {}
 
 // ─── NAVIGATION ──────────────────────────────────────────────────────────────
 
-async function navigateTo(page, skipAnimation = false) {
-  if (skipAnimation) {
-    await showPage(page);
-    return;
-  }
-  playBulletAnimation(async () => {
-    await showPage(page);
-  });
+async function navigateTo(page) {
+  await showPage(page);
 }
 
 async function showPage(page) {
@@ -147,7 +140,7 @@ function initMatrixRain() {
   window.addEventListener('resize', resize);
 
   function draw() {
-    ctx.fillStyle = 'rgba(8,8,13,0.07)';
+    ctx.fillStyle = 'rgba(10,13,26,0.07)';
     ctx.fillRect(0, 0, w, h);
     ctx.font = `${fontSize}px 'SF Mono', monospace`;
 
@@ -165,150 +158,6 @@ function initMatrixRain() {
   matrixInterval = setInterval(draw, 90);
 }
 
-// ─── BULLET FREEZE ANIMATION ─────────────────────────────────────────────────
-
-function playBulletAnimation(onComplete) {
-  const canvas = document.getElementById('bullet-canvas');
-  const ctx = canvas.getContext('2d');
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  canvas.style.display = 'block';
-
-  const count = 8 + Math.floor(Math.random() * 5);
-  const bullets = [];
-
-  for (let i = 0; i < count; i++) {
-    const fromLeft = i % 2 === 0;
-    const yFraction = 0.1 + (i / count) * 0.8;
-    const yPos = canvas.height * yFraction;
-    const speed = 10 + Math.random() * 8;
-    const length = 22 + Math.random() * 14;
-    const width = 4 + Math.random() * 3;
-    const targetX = canvas.width * (0.25 + Math.random() * 0.5);
-
-    bullets.push({
-      x: fromLeft ? -length - 10 : canvas.width + length + 10,
-      y: yPos,
-      vy: (Math.random() - 0.5) * 1.2,
-      vx: fromLeft ? speed : -speed,
-      targetX,
-      length,
-      width,
-      fromLeft,
-      frozen: false,
-      dropY: 0,
-      dropSpeed: 0,
-      dropDelay: i * 35,
-      opacity: 1,
-    });
-  }
-
-  let phase = 'flying';
-  let frozenAt = 0;
-  let animId;
-  const startTime = performance.now();
-
-  function drawBullet(b) {
-    const y = b.y + b.dropY;
-    const alpha = b.dropY > 0 ? Math.max(0, 1 - b.dropY / 180) : b.opacity;
-    if (alpha <= 0) return;
-
-    ctx.save();
-    ctx.translate(b.x, y);
-    ctx.globalAlpha = alpha;
-
-    const angle = b.vx >= 0 ? 0 : Math.PI;
-    ctx.rotate(angle);
-
-    // Glow
-    ctx.shadowColor = 'rgba(200,212,240,0.8)';
-    ctx.shadowBlur = b.frozen ? 16 : 6;
-
-    // Body gradient
-    const g = ctx.createLinearGradient(-b.length * 0.5, 0, b.length * 0.6, 0);
-    g.addColorStop(0, 'rgba(200,212,240,0)');
-    g.addColorStop(0.25, 'rgba(180,200,230,0.7)');
-    g.addColorStop(0.65, '#e8f0ff');
-    g.addColorStop(0.85, '#ffffff');
-    g.addColorStop(1, 'rgba(200,212,240,0.4)');
-    ctx.fillStyle = g;
-
-    // Diamond/bullet shape
-    ctx.beginPath();
-    ctx.moveTo(-b.length * 0.5, 0);
-    ctx.lineTo(b.length * 0.3, -b.width * 0.5);
-    ctx.lineTo(b.length * 0.6, 0);
-    ctx.lineTo(b.length * 0.3, b.width * 0.5);
-    ctx.closePath();
-    ctx.fill();
-
-    // Frozen shimmer ring
-    if (b.frozen && b.dropY === 0) {
-      ctx.strokeStyle = 'rgba(200,212,240,0.3)';
-      ctx.lineWidth = 1;
-      ctx.shadowBlur = 20;
-      ctx.beginPath();
-      ctx.ellipse(b.length * 0.05, 0, b.length * 0.35, b.width * 0.9, 0, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-
-    ctx.restore();
-  }
-
-  function animate(now) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const elapsed = now - startTime;
-
-    if (phase === 'flying') {
-      let allFrozen = true;
-      for (const b of bullets) {
-        if (!b.frozen) {
-          b.x += b.vx;
-          b.y += b.vy;
-          const dist = b.fromLeft ? b.targetX - b.x : b.x - (canvas.width - b.targetX);
-          if (dist <= 0 || elapsed > 750) b.frozen = true;
-          else allFrozen = false;
-        }
-        drawBullet(b);
-      }
-      if (allFrozen || elapsed > 800) {
-        phase = 'frozen';
-        frozenAt = now;
-        bullets.forEach(b => { b.frozen = true; b.vx = 0; b.vy = 0; });
-      }
-    } else if (phase === 'frozen') {
-      bullets.forEach(b => drawBullet(b));
-      if (now - frozenAt >= 500) {
-        phase = 'dropping';
-      }
-    } else if (phase === 'dropping') {
-      let allGone = true;
-      const dropStart = frozenAt + 500;
-      for (const b of bullets) {
-        const dElapsed = now - dropStart - b.dropDelay;
-        if (dElapsed > 0) {
-          b.dropSpeed = Math.min(b.dropSpeed + 1.1, 22);
-          b.dropY += b.dropSpeed;
-          if (b.y + b.dropY < canvas.height + 60) allGone = false;
-        } else {
-          allGone = false;
-        }
-        drawBullet(b);
-      }
-      if (allGone) {
-        canvas.style.display = 'none';
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        cancelAnimationFrame(animId);
-        if (onComplete) onComplete();
-        return;
-      }
-    }
-    animId = requestAnimationFrame(animate);
-  }
-
-  animId = requestAnimationFrame(animate);
-}
-
 // ─── COACH PANEL ─────────────────────────────────────────────────────────────
 
 let coachPanelOpen = false;
@@ -319,8 +168,8 @@ function toggleCoachPanel() {
 
 function openCoachPanel() {
   document.getElementById('coach-panel').classList.add('open');
-  getOrCreateBackdrop().classList.add('open');
-  document.querySelector('.fab-btn').classList.add('active');
+  document.getElementById('coach-backdrop').classList.add('open');
+  document.getElementById('fab-btn').classList.add('active');
   coachPanelOpen = true;
   if (!coachLoaded) {
     loadChatHistory();
@@ -330,21 +179,9 @@ function openCoachPanel() {
 
 function closeCoachPanel() {
   document.getElementById('coach-panel').classList.remove('open');
-  getOrCreateBackdrop().classList.remove('open');
-  document.querySelector('.fab-btn').classList.remove('active');
+  document.getElementById('coach-backdrop').classList.remove('open');
+  document.getElementById('fab-btn').classList.remove('active');
   coachPanelOpen = false;
-}
-
-function getOrCreateBackdrop() {
-  let bd = document.getElementById('coach-backdrop');
-  if (!bd) {
-    bd = document.createElement('div');
-    bd.id = 'coach-backdrop';
-    bd.className = 'coach-backdrop';
-    bd.onclick = closeCoachPanel;
-    document.body.appendChild(bd);
-  }
-  return bd;
 }
 
 async function loadChatHistory() {
@@ -375,29 +212,40 @@ async function sendMessage() {
   const msg = input.value.trim();
   if (!msg) return;
   input.value = '';
+  input.style.height = 'auto';
   appendChatBubble('user', msg);
   const sendBtn = document.getElementById('chat-send');
   sendBtn.disabled = true;
   const container = document.getElementById('chat-messages');
   const typing = document.createElement('div');
   typing.className = 'chat-typing';
-  typing.textContent = '...';
+  typing.textContent = 'Coach is thinking...';
   container.appendChild(typing);
   container.scrollTop = container.scrollHeight;
   try {
     const { data: { session } } = await sb.auth.getSession();
+    if (!session?.access_token) throw new Error('Not authenticated');
     const res = await fetch(`${CONFIG.SUPABASE_URL}/functions/v1/ai-coach`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session.access_token}`,
+        'apikey': CONFIG.SUPABASE_ANON_KEY,
+      },
       body: JSON.stringify({ message: msg }),
     });
+    if (!res.ok) {
+      const txt = await res.text();
+      if (res.status === 404) throw new Error('Edge function not deployed yet — see setup instructions in Supabase dashboard.');
+      throw new Error(`HTTP ${res.status}: ${txt.substring(0,120)}`);
+    }
     const data = await res.json();
     typing.remove();
     if (data.error) throw new Error(data.error);
     appendChatBubble('assistant', data.reply);
   } catch (e) {
     typing.remove();
-    appendChatBubble('assistant', 'Error: ' + e.message);
+    appendChatBubble('assistant', '⚠️ ' + e.message);
   }
   sendBtn.disabled = false;
 }
@@ -427,9 +275,9 @@ async function renderDashboard() {
 
   el.innerHTML = `
     <div style="margin-bottom:20px">
-      <div style="font-size:13px;color:var(--text3);font-weight:500;margin-bottom:4px">${dayOfWeek()}</div>
+      <div style="font-size:13px;color:var(--muted);font-weight:500;margin-bottom:4px">${dayOfWeek()}</div>
       <div style="font-size:26px;font-weight:700;letter-spacing:-.4px">Week ${week} · Phase ${phase}</div>
-      <div style="font-size:14px;color:var(--text3);margin-top:2px">${PHASE_NAMES[phase]}</div>
+      <div style="font-size:14px;color:var(--muted);margin-top:2px">${PHASE_NAMES[phase]}</div>
     </div>
 
     <div class="stats-row">
@@ -447,7 +295,7 @@ async function renderDashboard() {
     <div class="card card-sm">
       <div class="flex-between mb-8">
         <span style="font-size:14px;font-weight:500">${doneCount} / ${CHECKLIST_ITEMS.length} habits</span>
-        <span style="font-size:13px;color:var(--text3)">${pct}%</span>
+        <span style="font-size:13px;color:var(--muted)">${pct}%</span>
       </div>
       <div class="prog-track"><div class="prog-fill" style="width:${pct}%"></div></div>
     </div>
@@ -457,7 +305,7 @@ async function renderDashboard() {
       <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:${PHASE_COLORS[phase]};margin-bottom:6px">Phase ${phase} · ${PHASE_NAMES[phase]}</div>
       <div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:12px">${PHASE_TEXT[phase]}</div>
       <div class="prog-track"><div class="prog-fill" style="width:${(week/20)*100}%;background:${PHASE_COLORS[phase]}"></div></div>
-      <div style="font-size:11px;color:var(--text3);margin-top:6px">Week ${week} of 20</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px">Week ${week} of 20</div>
     </div>
 
     <div class="section-title">Set current week</div>
@@ -591,10 +439,23 @@ function renderWorkouts() {
   renderWorkoutDay(activeDay);
 }
 
-function renderWorkoutDay(day) {
+async function fetchPrevWorkout(dayTitle) {
+  const keyword = dayTitle.split('—')[0].replace('—','').trim();
+  const { data } = await sb.from('workout_logs')
+    .select('id,date,exercises,whoop_recovery,session_rating,notes')
+    .eq('user_id', currentUser.id)
+    .ilike('day_name', `%${keyword.substring(0,8)}%`)
+    .order('date', { ascending: false })
+    .limit(2);
+  return data ?? [];
+}
+
+async function renderWorkoutDay(day) {
   const w = WORKOUTS[day];
   const el = document.getElementById('workout-day-content');
   if (!w) { el.innerHTML = ''; return; }
+
+  el.innerHTML = '<div class="loading-overlay"><div class="spinner"></div></div>';
 
   if (w.rest) {
     el.innerHTML = `
@@ -607,73 +468,133 @@ function renderWorkoutDay(day) {
     return;
   }
 
+  const prevSessions = await fetchPrevWorkout(w.title);
+  const prevSession = prevSessions[0]; // most recent
+  const editSession = prevSessions.find(s => s.date === todayStr()) ?? null; // today's session if exists
+
+  // Build previous weights map
+  const prevData = {};
+  if (prevSession) {
+    (prevSession.exercises ?? []).forEach(ex => {
+      if (ex.sets?.length > 0) {
+        const best = ex.sets.reduce((b, s) => (parseFloat(s.weight)||0) > (parseFloat(b.weight)||0) ? s : b, ex.sets[0]);
+        prevData[ex.name] = best;
+      }
+    });
+  }
+
+  // Build edit data map (today's already-logged session)
+  const editData = {};
+  let editLogId = null;
+  if (editSession) {
+    editLogId = editSession.id;
+    (editSession.exercises ?? []).forEach(ex => { editData[ex.name] = ex.sets ?? []; });
+  }
+
   el.innerHTML = `
     <div class="day-header">
       <div class="day-title">${w.title}</div>
       <div class="day-focus">${w.focus}</div>
       <div class="day-note">${w.note}</div>
     </div>
-    <div class="table-wrap" style="margin-bottom:18px">
-      <table><thead><tr><th>Exercise</th><th>Sets</th><th>Reps</th><th>Rest</th></tr></thead><tbody>
-        ${w.exercises.map(ex => `<tr>
-          <td>${ex.name}${ex.key ? '<span class="badge badge-key">KEY</span>' : ''}${ex.ss ? '<span class="badge badge-ss">SS</span>' : ''}</td>
-          <td>${ex.sets}</td><td>${ex.reps}</td><td>${ex.rest}</td>
-        </tr>`).join('')}
-      </tbody></table>
+
+    ${prevSession && prevSession.date !== todayStr() ? `
+    <div class="infobox" style="margin-bottom:14px">
+      <span style="color:var(--accent);font-weight:600">Last session:</span> ${prevSession.date}
+      ${prevSession.session_rating ? ` · ${prevSession.session_rating}/5 ⭐` : ''}
+    </div>` : ''}
+
+    ${editSession ? `
+    <div class="infobox infobox-green" style="margin-bottom:14px">
+      Session logged today — editing existing entry.
+    </div>` : ''}
+
+    <div class="section-title">Log session</div>
+    <div class="field-row" style="margin-bottom:12px">
+      <div class="field"><label>Recovery</label>
+        <select id="log-whoop">
+          <option value="">Select</option>
+          <option value="green" ${editSession?.whoop_recovery==='green'?'selected':''}>🟢 Green</option>
+          <option value="yellow" ${editSession?.whoop_recovery==='yellow'?'selected':''}>🟡 Yellow</option>
+          <option value="red" ${editSession?.whoop_recovery==='red'?'selected':''}>🔴 Red</option>
+        </select>
+      </div>
+      <div class="field"><label>Rating (1–5)</label>
+        <input type="number" min="1" max="5" id="log-rating" placeholder="4" value="${editSession?.session_rating??''}">
+      </div>
     </div>
-    <div class="section-title">Log this session</div>
-    <div class="card">
-      <div class="field-row">
-        <div class="field"><label>Recovery</label>
-          <select id="log-whoop"><option value="">Select</option><option value="green">🟢 Green</option><option value="yellow">🟡 Yellow</option><option value="red">🔴 Red</option></select>
-        </div>
-        <div class="field"><label>Rating (1–5)</label>
-          <input type="number" min="1" max="5" id="log-rating" placeholder="4">
-        </div>
-      </div>
-      ${w.exercises.map((ex, i) => `
-        <div style="margin-bottom:12px">
-          <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">${ex.name}</div>
-          <div style="display:grid;grid-template-columns:repeat(${Math.min(ex.sets,4)},1fr);gap:7px">
-            ${Array.from({length:ex.sets},(_,s) => `
-              <div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:9px;text-align:center">
-                <div style="font-size:9px;color:var(--text3);font-weight:600;margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">S${s+1}</div>
-                <input class="ex-input" type="number" placeholder="kg" id="ex-${i}-${s}-w" min="0" step="0.5">
-                <div style="height:5px"></div>
-                <input class="ex-input" type="number" placeholder="reps" id="ex-${i}-${s}-r" min="0">
-              </div>`).join('')}
+
+    ${w.exercises.map((ex, i) => {
+      const prev = prevData[ex.name];
+      const prevLabel = prev ? `${prev.weight||'?'} lbs × ${prev.reps||'?'}` : null;
+      const todaySets = editData[ex.name] ?? [];
+      return `
+      <div class="ex-card">
+        <div class="ex-card-header">
+          <div class="ex-card-name">
+            ${ex.name}
+            ${ex.key ? '<span class="badge badge-key">KEY</span>' : ''}
+            ${ex.ss ? '<span class="badge badge-ss">SS</span>' : ''}
           </div>
-        </div>`).join('')}
-      <div class="field"><label>Notes</label><textarea id="log-notes" placeholder="How did it feel?" rows="2"></textarea></div>
-      <div class="form-actions">
-        <button class="btn btn-sm" onclick="saveWorkoutLog('${day}')">Save Session</button>
-      </div>
+          ${prevLabel ? `<div class="ex-card-prev">Last: ${prevLabel}</div>` : ''}
+        </div>
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:8px">${ex.reps} reps · ${ex.rest} rest</div>
+        ${Array.from({length:ex.sets},(_,s) => {
+          const setData = todaySets[s];
+          const prevSet = prevSession ? (prevSession.exercises?.find(e=>e.name===ex.name)?.sets?.[s]) : null;
+          return `<div class="set-row">
+            <span class="set-num">${s+1}</span>
+            <input class="set-input" type="number" placeholder="${prevSet?.weight??'lbs'}" id="ex-${i}-${s}-w" min="0" step="0.5" value="${setData?.weight??''}">
+            <span class="set-sep">×</span>
+            <input class="set-input" type="number" placeholder="${prevSet?.reps??'reps'}" id="ex-${i}-${s}-r" min="0" value="${setData?.reps??''}">
+          </div>`;
+        }).join('')}
+      </div>`;
+    }).join('')}
+
+    <div class="field" style="margin-top:4px"><label>Notes</label>
+      <textarea id="log-notes" placeholder="How did it feel? PRs?" rows="2">${editSession?.notes??''}</textarea>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-sm" onclick="saveWorkoutLog('${day}', '${editLogId}')">
+        ${editLogId ? 'Update Session' : 'Save Session'}
+      </button>
     </div>`;
 }
 
-async function saveWorkoutLog(day) {
+async function saveWorkoutLog(day, editLogId) {
   const w = WORKOUTS[day];
   const logged = w.exercises.map((ex, i) => ({
     name: ex.name,
     sets: Array.from({length:ex.sets},(_,s) => ({
       weight: document.getElementById(`ex-${i}-${s}-w`)?.value ?? '',
       reps: document.getElementById(`ex-${i}-${s}-r`)?.value ?? '',
-    })).filter(s => s.weight || s.reps),
+    })),
   }));
 
-  const { error } = await sb.from('workout_logs').insert({
+  const payload = {
     user_id: currentUser.id, date: todayStr(),
     phase: userProfile?.current_phase ?? 1, week: userProfile?.current_week ?? 1,
     day_name: w.title, exercises: logged,
     whoop_recovery: document.getElementById('log-whoop')?.value || null,
     session_rating: parseInt(document.getElementById('log-rating')?.value) || null,
     notes: document.getElementById('log-notes')?.value ?? '',
-  });
+  };
+
+  let error;
+  if (editLogId && editLogId !== 'null') {
+    ({ error } = await sb.from('workout_logs').update(payload).eq('id', editLogId).eq('user_id', currentUser.id));
+  } else {
+    ({ error } = await sb.from('workout_logs').insert(payload));
+  }
+
   if (error) { toast('Error: ' + error.message, 'error'); return; }
   await sb.from('checklist_logs').upsert({
     user_id: currentUser.id, date: todayStr(), item_id: 'training', item_label: 'Training session completed and logged', completed: true,
   }, { onConflict: 'user_id,date,item_id' });
-  toast('Session saved!', 'success');
+  toast(editLogId && editLogId !== 'null' ? 'Session updated!' : 'Session saved!', 'success');
+  // Refresh to show updated state
+  await renderWorkoutDay(day);
 }
 
 // ─── STATS (Progress + Measurements) ─────────────────────────────────────────
@@ -777,15 +698,15 @@ async function renderStats() {
     </div>` : ''}`;
 
   setTimeout(() => {
-    if (completionDates.length > 1) makeLineChart('chart-completion', completionDates, completionPcts, 'Completion %', '#ffffff');
+    if (completionDates.length > 1) makeLineChart('chart-completion', completionDates, completionPcts, 'Completion %', '#c8d4f0');
     if (measures.length > 1) {
-      makeLineChart('chart-weight', measures.map(m=>m.date), measures.map(m=>m.weight_lbs), 'Weight', '#ffffff');
-      makeLineChart('chart-bf', measures.map(m=>m.date), measures.map(m=>m.body_fat_pct), 'Body Fat %', '#f87171');
-      makeLineChart('chart-vtaper', measures.map(m=>m.date), measures.map(m=> m.shoulders_cm&&m.waist_cm?(m.shoulders_cm/m.waist_cm).toFixed(2):null), 'Ratio', '#7b9fd4');
+      makeLineChart('chart-weight', measures.map(m=>m.date), measures.map(m=>m.weight_lbs), 'Weight (lbs)', '#c8d4f0');
+      makeLineChart('chart-bf', measures.map(m=>m.date), measures.map(m=>m.body_fat_pct), 'Body Fat %', '#c0392b');
+      makeLineChart('chart-vtaper', measures.map(m=>m.date), measures.map(m=> m.shoulders_cm&&m.waist_cm?(m.shoulders_cm/m.waist_cm).toFixed(2):null), 'V-Taper Ratio', '#7b9fd4');
     }
     KEY_EXERCISES.forEach(ex => {
       const pts = keyExData[ex];
-      if (pts.length > 1) makeLineChart(`chart-ex-${ex.replace(/\s+/g,'_')}`, pts.map(p=>p.date), pts.map(p=>p.weight), 'kg', '#a5c0e0');
+      if (pts.length > 1) makeLineChart(`chart-ex-${ex.replace(/\s+/g,'_')}`, pts.map(p=>p.date), pts.map(p=>p.weight), 'lbs', '#c8d4f0');
     });
   }, 50);
 }
@@ -805,7 +726,7 @@ async function renderProfile() {
     <div class="page-subtitle">Log measurements · track composition</div>
 
     <div class="card" style="margin-bottom:14px">
-      <div style="font-size:12px;color:var(--text3);margin-bottom:14px">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:14px">
         Tap avatar → <strong style="color:var(--text2)">Body Measurements</strong> to return here.
       </div>
     </div>
@@ -915,7 +836,7 @@ function renderProgram() {
           'WHOOP recovery dictates training intensity. Green goes hard. Red rests.',
           'Vacuum breathing every morning on empty stomach. 5 sets.',
           "Spade don't fold.",
-        ].map((law, i) => `<div class="proto-item"><div style="font-size:12px;font-weight:700;color:var(--text3);min-width:24px">0${i+1}</div><div>${law}</div></div>`).join('')}
+        ].map((law, i) => `<div class="proto-item"><div style="font-size:12px;font-weight:700;color:var(--muted);min-width:24px">0${i+1}</div><div>${law}</div></div>`).join('')}
       </div>
     </div>
 
@@ -924,7 +845,7 @@ function renderProgram() {
       <div class="card">${['Cold shower immediately on waking · 3–5 min','No phone for first 30 minutes','Sunlight outdoors · 10–15 min','Jump rope · 5–10 min (daily, non-negotiable)','Spinal decompression AM stack','Vacuum breathing · 5 × 20s holds on empty stomach','High-protein breakfast within 60 min of waking'].map(i=>`<div class="proto-item"><div class="proto-dot"></div>${i}</div>`).join('')}</div>
       <div class="section-title">AM Spinal Stack</div>
       <div class="table-wrap"><table><thead><tr><th>Movement</th><th>Volume</th><th>Purpose</th></tr></thead><tbody>
-        ${[['Dead hang','60s × 3','Spinal traction'],['Cat-cow','15 reps','Disc hydration'],["Child's pose",'60s','Lumbar decompression'],['Cobra pose','30s × 2','Anterior spinal opening'],['Hip flexor stretch','45s each side','Pelvic tilt correction']].map(([m,v,p])=>`<tr><td>${m}</td><td>${v}</td><td style="color:var(--text3)">${p}</td></tr>`).join('')}
+        ${[['Dead hang','60s × 3','Spinal traction'],['Cat-cow','15 reps','Disc hydration'],["Child's pose",'60s','Lumbar decompression'],['Cobra pose','30s × 2','Anterior spinal opening'],['Hip flexor stretch','45s each side','Pelvic tilt correction']].map(([m,v,p])=>`<tr><td>${m}</td><td>${v}</td><td style="color:var(--muted)">${p}</td></tr>`).join('')}
       </tbody></table></div>
       <div class="section-title">Night · 21:00–22:00</div>
       <div class="card">${['Spinal decompression repeat — hang, cat-cow, child\'s pose','Legs up wall · 5 minutes','Magnesium glycinate · 400mg','Casein protein or Greek yogurt','No food 3 hours before bed','No screens 60 min before bed','Room temperature 18–20°C','Same sleep and wake time every day','Sleep on back or side — never stomach'].map(i=>`<div class="proto-item"><div class="proto-dot"></div>${i}</div>`).join('')}</div>
@@ -932,20 +853,20 @@ function renderProgram() {
 
     <div id="prog-nutrition" class="prog-section" style="display:none">
       <div class="card card-sm flex-between" style="margin-bottom:8px">
-        <span style="font-size:13px;color:var(--text3)">Bulk calories</span>
+        <span style="font-size:13px;color:var(--muted)">Bulk calories</span>
         <span style="font-weight:700">× 16–18 lbs bodyweight</span>
       </div>
       <div class="card card-sm flex-between" style="margin-bottom:8px">
-        <span style="font-size:13px;color:var(--text3)">Cut calories</span>
+        <span style="font-size:13px;color:var(--muted)">Cut calories</span>
         <span style="font-weight:700">× 13–15 lbs bodyweight</span>
       </div>
       <div class="card card-sm flex-between" style="margin-bottom:14px">
-        <span style="font-size:13px;color:var(--text3)">Protein</span>
+        <span style="font-size:13px;color:var(--muted)">Protein</span>
         <span style="font-weight:700">1g+ per lb bodyweight</span>
       </div>
       <div class="section-title">Supplements</div>
       <div class="table-wrap"><table><thead><tr><th>Supplement</th><th>Dose</th><th>Timing</th></tr></thead><tbody>
-        ${[['Creatine monohydrate','5g daily','Any'],['Vitamin D3','4000–5000 IU','Morning'],['Vitamin K2','100–200mcg','With D3'],['Magnesium glycinate','400mg','Night'],['Omega-3','2–3g','With food'],['Zinc','15–25mg','With food'],['Vitamin C','500–1000mg','Any'],['Collagen peptides','10–15g','Morning']].map(([n,d,t])=>`<tr><td style="color:var(--text)">${n}</td><td>${d}</td><td style="color:var(--text3)">${t}</td></tr>`).join('')}
+        ${[['Creatine monohydrate','5g daily','Any'],['Vitamin D3','4000–5000 IU','Morning'],['Vitamin K2','100–200mcg','With D3'],['Magnesium glycinate','400mg','Night'],['Omega-3','2–3g','With food'],['Zinc','15–25mg','With food'],['Vitamin C','500–1000mg','Any'],['Collagen peptides','10–15g','Morning']].map(([n,d,t])=>`<tr><td style="color:var(--text)">${n}</td><td>${d}</td><td style="color:var(--muted)">${t}</td></tr>`).join('')}
       </tbody></table></div>
     </div>
 
@@ -967,7 +888,7 @@ function renderProgram() {
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
         ${[['Mon','Back Width'],['Tue','Legs Quad'],['Wed','Chest + Arms'],['Thu','Rest / Swim'],['Fri','Legs Post.'],['Sat','Shoulders'],['Sun','Arms + Abs']].map(([d,f])=>`
           <div class="card card-sm" style="text-align:center">
-            <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:4px">${d}</div>
+            <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px">${d}</div>
             <div style="font-size:14px;font-weight:600">${f}</div>
           </div>`).join('')}
       </div>
@@ -1016,8 +937,8 @@ function makeLineChart(id, labels, data, label, color) {
       responsive: true,
       plugins: { legend: { display: false } },
       scales: {
-        x: { ticks: { color: 'rgba(255,255,255,.25)', font: { size: 9 }, maxTicksLimit: 7 }, grid: { color: 'rgba(255,255,255,.04)' } },
-        y: { ticks: { color: 'rgba(255,255,255,.25)', font: { size: 9 } }, grid: { color: 'rgba(255,255,255,.04)' } },
+        x: { ticks: { color: '#4a5568', font: { size: 9 }, maxTicksLimit: 7 }, grid: { color: '#1e2d4a' } },
+        y: { ticks: { color: '#4a5568', font: { size: 9 } }, grid: { color: '#1e2d4a' } },
       },
     }
   });
