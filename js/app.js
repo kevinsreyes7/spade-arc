@@ -20,11 +20,11 @@ async function init() {
   await loadProfile();
 
   document.getElementById('app-header').style.display = 'block';
+  document.getElementById('bottom-nav').style.display = 'flex';
   document.getElementById('user-avatar').textContent = (currentUser.email?.[0] ?? 'U').toUpperCase();
   document.getElementById('dropdown-email').textContent = currentUser.email;
-  updateTierBadge();
 
-  // Tab nav
+  // Bottom nav
   document.querySelectorAll('.nav-tab').forEach(btn => {
     btn.addEventListener('click', () => showPage(btn.dataset.page));
   });
@@ -77,10 +77,7 @@ function hasAccess() {
   return true;
 }
 
-function updateTierBadge() {
-  const badge = document.getElementById('tier-badge');
-  badge.style.display = 'none';
-}
+function updateTierBadge() {}
 
 // ─── NAVIGATION ──────────────────────────────────────────────────────────────
 
