@@ -11,6 +11,15 @@
 </head>
 <body>
 
+<!-- MATRIX RAIN CANVAS (behind everything) -->
+<canvas id="matrix-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;display:none"></canvas>
+
+<!-- BULLET ANIMATION CANVAS (overlay on transitions) -->
+<canvas id="bullet-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:9990;pointer-events:none;display:none"></canvas>
+
+<!-- PAGE CONTENT WRAPPER -->
+<div id="app-wrap" style="position:relative;z-index:1">
+
 <!-- HEADER -->
 <header class="app-header" id="app-header" style="display:none">
   <div class="header-bar">
@@ -21,87 +30,13 @@
         <div class="user-dropdown" id="user-dropdown">
           <div class="dropdown-label">Account</div>
           <div class="dropdown-item" id="dropdown-email" style="font-size:12px;color:var(--text3)"></div>
+          <div class="dropdown-item" onclick="openProfile()">Body Measurements</div>
           <div class="dropdown-item danger" onclick="handleSignOut()">Sign Out</div>
         </div>
       </div>
     </div>
   </div>
 </header>
-
-<!-- BOTTOM NAV -->
-<nav class="bottom-nav" id="bottom-nav" style="display:none">
-
-  <button class="nav-tab active" data-page="dashboard">
-    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/>
-    </svg>
-    <span class="nav-label">Home</span>
-  </button>
-
-  <button class="nav-tab" data-page="today">
-    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-      <polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
-    </svg>
-    <span class="nav-label">Today</span>
-  </button>
-
-  <button class="nav-tab" data-page="workouts">
-    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M6 4v6a6 6 0 0012 0V4"/><line x1="6" y1="7" x2="18" y2="7"/>
-    </svg>
-    <span class="nav-label">Train</span>
-  </button>
-
-  <button class="nav-tab" data-page="coach">
-    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
-    </svg>
-    <span class="nav-label">Coach</span>
-  </button>
-
-  <button class="nav-tab" data-page="measurements">
-    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-      <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
-    </svg>
-    <span class="nav-label">Body</span>
-  </button>
-
-  <button class="nav-tab" data-page="whoop">
-    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-    </svg>
-    <span class="nav-label">WHOOP</span>
-  </button>
-
-  <button class="nav-tab" data-page="journal">
-    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
-    </svg>
-    <span class="nav-label">Journal</span>
-  </button>
-
-  <button class="nav-tab" data-page="progress">
-    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-      <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>
-    </svg>
-    <span class="nav-label">Progress</span>
-  </button>
-
-  <button class="nav-tab" data-page="schedule">
-    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
-    </svg>
-    <span class="nav-label">Schedule</span>
-  </button>
-
-  <button class="nav-tab" data-page="program">
-    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-      <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
-    </svg>
-    <span class="nav-label">Program</span>
-  </button>
-
-</nav>
 
 <main id="main-content">
 
@@ -111,33 +46,11 @@
 <!-- PAGE: TODAY -->
 <div id="page-today" class="page"></div>
 
-<!-- PAGE: COACH -->
-<div id="page-coach" class="page">
-  <div class="page-title">AI Coach</div>
-  <div class="page-subtitle">Powered by Claude · SPADE ARC system prompt</div>
-  <div id="coach-paywall"></div>
-  <div id="coach-chat" style="display:none">
-    <div class="chat-wrap">
-      <div class="chat-messages" id="chat-messages">
-        <div class="chat-msg">
-          <div class="chat-avatar ai">S</div>
-          <div class="chat-bubble">I'm your SPADE ARC coach. Ask me anything about your training, nutrition, recovery, or protocol. I have the full program loaded.<br><br>What do you need?</div>
-        </div>
-      </div>
-      <div class="chat-input-row">
-        <textarea class="chat-input" id="chat-input" placeholder="Ask your coach..." rows="1" onkeydown="chatKeydown(event)"></textarea>
-        <button class="chat-send" id="chat-send" onclick="sendMessage()">Send</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- PAGE: WORKOUTS -->
-<div id="page-workouts" class="page">
-  <div class="page-title">Workouts</div>
-  <div class="page-subtitle">Log sets, reps, weights · track progression</div>
-  <div id="workouts-paywall"></div>
-  <div id="workouts-content" style="display:none">
+<!-- PAGE: TRAIN (workouts) -->
+<div id="page-train" class="page">
+  <div class="page-title">Train</div>
+  <div class="page-subtitle">Log sessions · track progression</div>
+  <div id="workouts-content">
     <div class="section-title">Phase</div>
     <div class="sub-tabs" id="phase-tabs">
       <button class="sub-tab active" data-phase="1">Phase I</button>
@@ -160,61 +73,109 @@
   </div>
 </div>
 
-<!-- PAGE: MEASUREMENTS -->
-<div id="page-measurements" class="page">
-  <div class="page-title">Measurements</div>
-  <div class="page-subtitle">Track body composition over time</div>
-  <div id="measurements-paywall"></div>
-  <div id="measurements-content" style="display:none"></div>
-</div>
+<!-- PAGE: STATS (progress + measurements) -->
+<div id="page-stats" class="page"></div>
 
-<!-- PAGE: WHOOP -->
-<div id="page-whoop" class="page">
-  <div class="page-title">WHOOP</div>
-  <div class="page-subtitle">Daily recovery tracking · HRV · sleep quality</div>
-  <div id="whoop-content"></div>
-</div>
-
-<!-- PAGE: JOURNAL -->
-<div id="page-journal" class="page">
-  <div class="page-title">Journal</div>
-  <div class="page-subtitle">Reflect. Track. Build the mind.</div>
-  <div id="journal-paywall"></div>
-  <div id="journal-content" style="display:none"></div>
-</div>
-
-<!-- PAGE: PROGRESS -->
-<div id="page-progress" class="page">
-  <div class="page-title">Progress</div>
-  <div class="page-subtitle">All charts · trends · streaks</div>
-  <div id="progress-paywall"></div>
-  <div id="progress-content" style="display:none"></div>
-</div>
-
-<!-- PAGE: SCHEDULE -->
-<div id="page-schedule" class="page">
-  <div class="page-title">Schedule</div>
-  <div class="page-subtitle">20-week breakdown · phase overview</div>
-  <div id="schedule-content"></div>
-</div>
-
-<!-- PAGE: PROGRAM -->
+<!-- PAGE: PROGRAM (protocol + schedule) -->
 <div id="page-program" class="page">
   <div class="page-title">Program</div>
-  <div class="page-subtitle">Full SPADE ARC protocol reference</div>
+  <div class="page-subtitle">Full SPADE ARC protocol</div>
   <div id="program-content"></div>
+</div>
+
+<!-- PAGE: PROFILE / MEASUREMENTS (hidden from nav, opened via avatar) -->
+<div id="page-profile" class="page">
+  <div class="page-title">Body</div>
+  <div class="page-subtitle">Measurements · track composition</div>
+  <div id="profile-content"></div>
 </div>
 
 </main>
 
+<!-- BOTTOM NAV — 5 TABS -->
+<nav class="bottom-nav" id="bottom-nav" style="display:none">
+
+  <button class="nav-tab active" data-page="dashboard">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/>
+    </svg>
+    <span class="nav-label">Home</span>
+  </button>
+
+  <button class="nav-tab" data-page="today">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+    </svg>
+    <span class="nav-label">Today</span>
+  </button>
+
+  <button class="nav-tab" data-page="train">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="18" cy="5" r="2"/><circle cx="18" cy="19" r="2"/><circle cx="6" cy="12" r="2"/>
+      <line x1="18" y1="7" x2="18" y2="17"/><line x1="16" y1="5" x2="8" y2="11"/><line x1="16" y1="19" x2="8" y2="13"/>
+    </svg>
+    <span class="nav-label">Train</span>
+  </button>
+
+  <button class="nav-tab" data-page="stats">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>
+    </svg>
+    <span class="nav-label">Stats</span>
+  </button>
+
+  <button class="nav-tab" data-page="program">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
+      <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+    </svg>
+    <span class="nav-label">Program</span>
+  </button>
+
+</nav>
+
+<!-- FLOATING COACH BUTTON -->
+<div id="coach-fab" style="display:none">
+  <button class="fab-btn" onclick="toggleCoachPanel()" title="AI Coach">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+    </svg>
+  </button>
+</div>
+
+<!-- COACH SLIDE-UP PANEL -->
+<div id="coach-panel" class="coach-panel">
+  <div class="coach-panel-drag" onclick="closeCoachPanel()"></div>
+  <div class="coach-panel-header">
+    <div>
+      <div style="font-size:16px;font-weight:700">AI Coach</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:2px">Powered by Claude · SPADE ARC</div>
+    </div>
+    <button class="coach-close" onclick="closeCoachPanel()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="chat-messages" id="chat-messages">
+    <div class="chat-msg">
+      <div class="chat-avatar ai">S</div>
+      <div class="chat-bubble">I'm your SPADE ARC coach. Ask me anything about training, nutrition, recovery, or protocol.</div>
+    </div>
+  </div>
+  <div class="chat-input-row">
+    <textarea class="chat-input" id="chat-input" placeholder="Ask your coach..." rows="1" onkeydown="chatKeydown(event)"></textarea>
+    <button class="chat-send" id="chat-send" onclick="sendMessage()">↑</button>
+  </div>
+</div>
+
+</div><!-- end app-wrap -->
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- SCRIPTS -->
-<script src="js/config.js"></script>
-<script src="js/data.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/data.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
-<script src="js/app.js"></script>
+<script src="/js/app.js"></script>
 </body>
 </html>
