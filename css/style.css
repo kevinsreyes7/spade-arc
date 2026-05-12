@@ -894,6 +894,113 @@ hr { border: none; border-top: 1px solid var(--border2); margin: 16px 0; }
 .set-input:focus { outline: none; border-color: var(--accent); }
 .set-input::placeholder { color: var(--muted); font-size: 12px; }
 
+/* ─── WORKOUT TIMER ─── */
+.wt-timer-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 16px 18px;
+  margin-bottom: 16px;
+  position: sticky;
+  top: calc(50px + env(safe-area-inset-top, 0px));
+  z-index: 10;
+}
+.wt-time {
+  font-family: 'SF Mono', 'DM Mono', monospace;
+  font-size: 34px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: .04em;
+  line-height: 1;
+}
+.wt-state {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.wt-actions { display: flex; gap: 8px; }
+.wt-btn {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 16px;
+  transition: all .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.wt-btn:hover { border-color: var(--accent); color: var(--accent); }
+.wt-finish {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+}
+.wt-finish:hover { opacity: .85; }
+
+/* ─── POST-WORKOUT SCREEN ─── */
+.pw-header {
+  text-align: center;
+  padding: 28px 0 20px;
+}
+.pw-check {
+  font-size: 44px;
+  color: var(--ok);
+  margin-bottom: 10px;
+}
+.pw-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -.3px;
+}
+.pw-duration {
+  font-size: 15px;
+  color: var(--muted);
+  margin-top: 4px;
+  font-family: 'SF Mono', monospace;
+}
+.pw-opt-btn {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 13px 14px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: all .15s;
+  -webkit-tap-highlight-color: transparent;
+  color: var(--text);
+}
+.pw-opt-btn:hover { border-color: var(--accent); }
+.pw-opt-btn.selected {
+  background: rgba(200,212,240,.07);
+  border-color: var(--accent);
+}
+.pw-opt-icon { font-size: 22px; flex-shrink: 0; min-width: 28px; text-align: center; }
+.pw-opt-name { font-size: 14px; font-weight: 600; }
+.pw-opt-desc { font-size: 12px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+.pw-opt-check {
+  margin-left: auto;
+  font-size: 15px;
+  color: var(--accent);
+  opacity: 0;
+  transition: opacity .15s;
+  flex-shrink: 0;
+}
+.pw-opt-btn.selected .pw-opt-check { opacity: 1; }
+
 /* ─── FLOATING COACH BUTTON ─── */
 #coach-fab {
   position: fixed;

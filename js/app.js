@@ -12,6 +12,31 @@ let charts = {};
 let matrixInterval = null;
 let coachLoaded = false;
 
+// ─── WORKOUT TIMER STATE ──────────────────────────────────────────────────────
+let wState = 'idle';      // idle | active | paused | done
+let wCurrentDay = null;
+let wStartTime = null;
+let wElapsedMs = 0;
+let wTimerInterval = null;
+let wCapturedExercises = null;
+let wSelectedRecovery = new Set();
+let wSelectedCardio = new Set();
+
+const RECOVERY_OPTS = [
+  { id: 'cold_shower',    icon: '🥶', name: 'Cold Shower',         desc: '3–5 min · norepinephrine +300%' },
+  { id: 'sauna',          icon: '🧖', name: 'Sauna',               desc: '15–20 min · GH +200–300%' },
+  { id: 'contrast',       icon: '🔄', name: 'Contrast Therapy',    desc: 'Hot/cold alternating · DOMS -30%' },
+  { id: 'decompression_pm',icon:'🧘', name: 'Spinal Decompression', desc: 'PM stack · hang, cat-cow, legs up' },
+  { id: 'magnesium',      icon: '💊', name: 'Magnesium Glycinate',  desc: '400mg · sleep quality + recovery' },
+];
+
+const CARDIO_OPTS = [
+  { id: 'liss',     icon: '🚶', name: 'LISS Walk',      desc: '35–45 min · 5–7% incline · 120–140 BPM' },
+  { id: 'hiit',     icon: '🏃', name: 'HIIT Sprints',   desc: '8–10 × 30s · not on leg day' },
+  { id: 'jump_rope',icon: '🪢', name: 'Jump Rope',      desc: '5–10 min · daily activation' },
+  { id: 'swim',     icon: '🏊', name: 'Swimming',       desc: '30–45 min · lat development + recovery' },
+];
+
 // ─── INIT ────────────────────────────────────────────────────────────────────
 
 async function init() {
@@ -379,13 +404,6 @@ async function renderToday() {
       <div class="field"><label>What did I resist or avoid?</label>
         <textarea id="j-avoided" placeholder="Temptations, shortcuts..." rows="2">${journalData?.avoided ?? ''}</textarea>
       </div>
-      <div class="field"><label>WHOOP recovery</label>
-        <div class="rating-row">
-          ${['green','yellow','red'].map(c => `
-            <button class="rating-btn ${journalData?.whoop_score === c ? 'active' : ''}" data-score="${c}" onclick="selectScore(this,'${c}')">${c.charAt(0).toUpperCase()+c.slice(1)}</button>
-          `).join('')}
-        </div>
-      </div>
       <div class="field"><label>Tomorrow's focus</label>
         <textarea id="j-tomorrow" placeholder="Non-negotiable for tomorrow..." rows="2">${journalData?.tomorrow_focus ?? ''}</textarea>
       </div>
@@ -410,13 +428,11 @@ async function toggleChecklist(itemId, label) {
 }
 
 async function saveJournal() {
-  const scoreBtn = document.querySelector('.rating-btn.active[data-score]');
   const { error } = await sb.from('journal_entries').upsert({
     user_id: currentUser.id, date: todayStr(),
     executed: document.getElementById('j-executed')?.value ?? '',
     avoided: document.getElementById('j-avoided')?.value ?? '',
     tomorrow_focus: document.getElementById('j-tomorrow')?.value ?? '',
-    whoop_score: scoreBtn?.dataset?.score ?? null,
   }, { onConflict: 'user_id,date' });
   if (error) { toast('Error saving', 'error'); return; }
   await sb.from('checklist_logs').upsert({
@@ -432,28 +448,114 @@ function renderWorkouts() {
   document.getElementById('phase-banner').textContent = PHASE_TEXT[phase];
   document.querySelectorAll('[data-phase]').forEach(b => b.classList.toggle('active', parseInt(b.dataset.phase) === phase));
 
-  const todayKey = new Date().toLocaleDateString('en-US', { weekday: 'short' }).toLowerCase().replace('.', '');
+  const todayKey = new Date().toLocaleDateString('en-US', { weekday: 'short' }).toLowerCase().replace('.','');
   const dayMap = { mon:'mon', tue:'tue', wed:'wed', thu:'thu', fri:'fri', sat:'sat', sun:'sun' };
   const activeDay = dayMap[todayKey] ?? 'mon';
   document.querySelectorAll('[data-day]').forEach(b => b.classList.toggle('active', b.dataset.day === activeDay));
+
+  // Restore timer if active
+  if (wState === 'active') _resumeTimerInterval();
   renderWorkoutDay(activeDay);
 }
 
 async function fetchPrevWorkout(dayTitle) {
-  const keyword = dayTitle.split('—')[0].replace('—','').trim();
+  const keyword = dayTitle.split('—')[0].trim().substring(0, 8);
   const { data } = await sb.from('workout_logs')
-    .select('id,date,exercises,whoop_recovery,session_rating,notes')
+    .select('id,date,exercises,session_rating,notes,duration_minutes')
     .eq('user_id', currentUser.id)
-    .ilike('day_name', `%${keyword.substring(0,8)}%`)
+    .ilike('day_name', `%${keyword}%`)
     .order('date', { ascending: false })
     .limit(2);
   return data ?? [];
 }
 
+// ── Timer helpers ──────────────────────────────────────────────────────────────
+
+function _fmtTime(ms) {
+  const s = Math.floor(ms / 1000);
+  const m = Math.floor(s / 60);
+  const h = Math.floor(m / 60);
+  const pp = n => String(n).padStart(2, '0');
+  return h > 0 ? `${pp(h)}:${pp(m % 60)}:${pp(s % 60)}` : `${pp(m)}:${pp(s % 60)}`;
+}
+
+function _tickTimer() {
+  const el = document.getElementById('wt-time');
+  if (!el) { clearInterval(wTimerInterval); return; }
+  el.textContent = _fmtTime(Date.now() - wStartTime);
+}
+
+function _resumeTimerInterval() {
+  clearInterval(wTimerInterval);
+  wTimerInterval = setInterval(_tickTimer, 500);
+}
+
+function startWorkout(day) {
+  wState = 'active';
+  wCurrentDay = day;
+  wStartTime = Date.now() - wElapsedMs;
+  wCapturedExercises = null;
+  wSelectedRecovery = new Set();
+  wSelectedCardio = new Set();
+  _resumeTimerInterval();
+  renderWorkoutDay(day);
+  // scroll to top of workout area
+  document.getElementById('workout-day-content')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function pauseWorkout(day) {
+  wElapsedMs = Date.now() - wStartTime;
+  wState = 'paused';
+  clearInterval(wTimerInterval);
+  document.getElementById('wt-state').textContent = 'PAUSED';
+  document.getElementById('wt-pause-btn').textContent = 'Resume';
+  document.getElementById('wt-pause-btn').onclick = () => resumeWorkout(day);
+}
+
+function resumeWorkout(day) {
+  wStartTime = Date.now() - wElapsedMs;
+  wState = 'active';
+  _resumeTimerInterval();
+  document.getElementById('wt-state').textContent = 'ACTIVE';
+  document.getElementById('wt-pause-btn').textContent = 'Pause';
+  document.getElementById('wt-pause-btn').onclick = () => pauseWorkout(day);
+}
+
+function finishWorkout(day) {
+  const w = WORKOUTS[day];
+  // Capture all exercise data from DOM before re-rendering
+  wCapturedExercises = w.exercises.map((ex, i) => ({
+    name: ex.name,
+    sets: Array.from({ length: ex.sets }, (_, s) => ({
+      weight: document.getElementById(`ex-${i}-${s}-w`)?.value ?? '',
+      reps: document.getElementById(`ex-${i}-${s}-r`)?.value ?? '',
+    })),
+  }));
+  wElapsedMs = Date.now() - wStartTime;
+  wState = 'done';
+  clearInterval(wTimerInterval);
+  renderPostWorkout(day);
+}
+
+function resetWorkout() {
+  wState = 'idle';
+  wCurrentDay = null;
+  wElapsedMs = 0;
+  wStartTime = null;
+  wCapturedExercises = null;
+  clearInterval(wTimerInterval);
+}
+
+// ── Render states ──────────────────────────────────────────────────────────────
+
 async function renderWorkoutDay(day) {
   const w = WORKOUTS[day];
   const el = document.getElementById('workout-day-content');
   if (!w) { el.innerHTML = ''; return; }
+
+  if (wState === 'done' && wCurrentDay === day) {
+    renderPostWorkout(day); return;
+  }
 
   el.innerHTML = '<div class="loading-overlay"><div class="spinner"></div></div>';
 
@@ -469,10 +571,9 @@ async function renderWorkoutDay(day) {
   }
 
   const prevSessions = await fetchPrevWorkout(w.title);
-  const prevSession = prevSessions[0]; // most recent
-  const editSession = prevSessions.find(s => s.date === todayStr()) ?? null; // today's session if exists
+  const prevSession = prevSessions.find(s => s.date !== todayStr()) ?? prevSessions[0] ?? null;
+  const todaySession = prevSessions.find(s => s.date === todayStr()) ?? null;
 
-  // Build previous weights map
   const prevData = {};
   if (prevSession) {
     (prevSession.exercises ?? []).forEach(ex => {
@@ -483,117 +584,261 @@ async function renderWorkoutDay(day) {
     });
   }
 
-  // Build edit data map (today's already-logged session)
-  const editData = {};
-  let editLogId = null;
-  if (editSession) {
-    editLogId = editSession.id;
-    (editSession.exercises ?? []).forEach(ex => { editData[ex.name] = ex.sets ?? []; });
-  }
+  // ── IDLE STATE: overview + Start button ──────────────────────────────────────
+  if (wState === 'idle' || wCurrentDay !== day) {
+    const editData = {};
+    let editLogId = null;
+    if (todaySession) {
+      editLogId = todaySession.id;
+      (todaySession.exercises ?? []).forEach(ex => { editData[ex.name] = ex.sets ?? []; });
+    }
 
-  el.innerHTML = `
-    <div class="day-header">
-      <div class="day-title">${w.title}</div>
-      <div class="day-focus">${w.focus}</div>
-      <div class="day-note">${w.note}</div>
-    </div>
+    el.innerHTML = `
+      <div class="day-header">
+        <div class="day-title">${w.title}</div>
+        <div class="day-focus">${w.focus}</div>
+        <div class="day-note">${w.note}</div>
+      </div>
 
-    ${prevSession && prevSession.date !== todayStr() ? `
-    <div class="infobox" style="margin-bottom:14px">
-      <span style="color:var(--accent);font-weight:600">Last session:</span> ${prevSession.date}
-      ${prevSession.session_rating ? ` · ${prevSession.session_rating}/5 ⭐` : ''}
-    </div>` : ''}
+      ${prevSession ? `
+      <div class="infobox mb-12">
+        <span style="color:var(--accent);font-weight:600">Last session:</span> ${prevSession.date}
+        ${prevSession.session_rating ? ` · ${prevSession.session_rating}/5` : ''}
+        ${prevSession.duration_minutes ? ` · ${prevSession.duration_minutes} min` : ''}
+      </div>` : ''}
 
-    ${editSession ? `
-    <div class="infobox infobox-green" style="margin-bottom:14px">
-      Session logged today — editing existing entry.
-    </div>` : ''}
+      ${todaySession ? `<div class="infobox infobox-green mb-12">Session already logged today — you can edit below or start a new one.</div>` : ''}
 
-    <div class="section-title">Log session</div>
-    <div class="field-row" style="margin-bottom:12px">
-      <div class="field"><label>Recovery</label>
-        <select id="log-whoop">
-          <option value="">Select</option>
-          <option value="green" ${editSession?.whoop_recovery==='green'?'selected':''}>🟢 Green</option>
-          <option value="yellow" ${editSession?.whoop_recovery==='yellow'?'selected':''}>🟡 Yellow</option>
-          <option value="red" ${editSession?.whoop_recovery==='red'?'selected':''}>🔴 Red</option>
-        </select>
+      <div class="table-wrap mb-12">
+        <table><thead><tr><th>Exercise</th><th>Sets</th><th>Reps</th><th>Rest</th></tr></thead><tbody>
+          ${w.exercises.map(ex => `<tr>
+            <td>${ex.name}${ex.key?'<span class="badge badge-key">KEY</span>':''}${ex.ss?'<span class="badge badge-ss">SS</span>':''}</td>
+            <td>${ex.sets}</td><td>${ex.reps}</td><td>${ex.rest}</td>
+          </tr>`).join('')}
+        </tbody></table>
+      </div>
+
+      <button class="btn" onclick="startWorkout('${day}')" style="margin-bottom:10px">
+        ▶ Start Workout
+      </button>
+
+      ${todaySession ? `
+      <div class="section-title mt-16">Edit Today's Session</div>
+      ${w.exercises.map((ex, i) => {
+        const todaySets = editData[ex.name] ?? [];
+        const prev = prevData[ex.name];
+        const prevLabel = prev ? `${prev.weight||'?'} lbs × ${prev.reps||'?'}` : null;
+        return `<div class="ex-card">
+          <div class="ex-card-header">
+            <div class="ex-card-name">${ex.name}${ex.key?'<span class="badge badge-key">KEY</span>':''}${ex.ss?'<span class="badge badge-ss">SS</span>':''}</div>
+            ${prevLabel?`<div class="ex-card-prev">Last: ${prevLabel}</div>`:''}
+          </div>
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:8px">${ex.reps} reps · ${ex.rest} rest</div>
+          ${Array.from({length:ex.sets},(_,s)=>{
+            const sd=todaySets[s];
+            const ps=prevSession?.exercises?.find(e=>e.name===ex.name)?.sets?.[s];
+            return `<div class="set-row">
+              <span class="set-num">${s+1}</span>
+              <input class="set-input" type="number" placeholder="${ps?.weight??'lbs'}" id="ex-${i}-${s}-w" min="0" step="0.5" value="${sd?.weight??''}">
+              <span class="set-sep">×</span>
+              <input class="set-input" type="number" placeholder="${ps?.reps??'reps'}" id="ex-${i}-${s}-r" min="0" value="${sd?.reps??''}">
+            </div>`;
+          }).join('')}
+        </div>`;
+      }).join('')}
+      <div class="field mt-8"><label>Notes</label>
+        <textarea id="log-notes" placeholder="How did it feel?" rows="2">${todaySession.notes??''}</textarea>
       </div>
       <div class="field"><label>Rating (1–5)</label>
-        <input type="number" min="1" max="5" id="log-rating" placeholder="4" value="${editSession?.session_rating??''}">
+        <input type="number" min="1" max="5" id="log-rating" value="${todaySession.session_rating??''}">
       </div>
+      <div class="form-actions">
+        <button class="btn btn-sm" onclick="saveWorkoutFromEdit('${day}','${editLogId}')">Update Session</button>
+      </div>` : ''}`;
+    return;
+  }
+
+  // ── ACTIVE / PAUSED STATE: timer + exercise inputs ───────────────────────────
+  el.innerHTML = `
+    <div class="wt-timer-bar">
+      <div>
+        <div class="wt-time" id="wt-time">${_fmtTime(Date.now() - wStartTime)}</div>
+        <div class="wt-state" id="wt-state">${wState === 'paused' ? 'PAUSED' : 'ACTIVE'}</div>
+      </div>
+      <div class="wt-actions">
+        <button class="wt-btn" id="wt-pause-btn" onclick="${wState === 'paused' ? `resumeWorkout('${day}')` : `pauseWorkout('${day}')`}">
+          ${wState === 'paused' ? 'Resume' : 'Pause'}
+        </button>
+        <button class="wt-btn wt-finish" onclick="finishWorkout('${day}')">Finish</button>
+      </div>
+    </div>
+
+    <div class="day-header">
+      <div class="day-focus">${w.focus}</div>
     </div>
 
     ${w.exercises.map((ex, i) => {
       const prev = prevData[ex.name];
       const prevLabel = prev ? `${prev.weight||'?'} lbs × ${prev.reps||'?'}` : null;
-      const todaySets = editData[ex.name] ?? [];
-      return `
-      <div class="ex-card">
+      return `<div class="ex-card">
         <div class="ex-card-header">
-          <div class="ex-card-name">
-            ${ex.name}
-            ${ex.key ? '<span class="badge badge-key">KEY</span>' : ''}
-            ${ex.ss ? '<span class="badge badge-ss">SS</span>' : ''}
-          </div>
-          ${prevLabel ? `<div class="ex-card-prev">Last: ${prevLabel}</div>` : ''}
+          <div class="ex-card-name">${ex.name}${ex.key?'<span class="badge badge-key">KEY</span>':''}${ex.ss?'<span class="badge badge-ss">SS</span>':''}</div>
+          ${prevLabel?`<div class="ex-card-prev">Last: ${prevLabel}</div>`:''}
         </div>
         <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:8px">${ex.reps} reps · ${ex.rest} rest</div>
-        ${Array.from({length:ex.sets},(_,s) => {
-          const setData = todaySets[s];
-          const prevSet = prevSession ? (prevSession.exercises?.find(e=>e.name===ex.name)?.sets?.[s]) : null;
+        ${Array.from({length:ex.sets},(_,s)=>{
+          const ps = prevSession?.exercises?.find(e=>e.name===ex.name)?.sets?.[s];
           return `<div class="set-row">
             <span class="set-num">${s+1}</span>
-            <input class="set-input" type="number" placeholder="${prevSet?.weight??'lbs'}" id="ex-${i}-${s}-w" min="0" step="0.5" value="${setData?.weight??''}">
+            <input class="set-input" type="number" placeholder="${ps?.weight??'lbs'}" id="ex-${i}-${s}-w" min="0" step="0.5">
             <span class="set-sep">×</span>
-            <input class="set-input" type="number" placeholder="${prevSet?.reps??'reps'}" id="ex-${i}-${s}-r" min="0" value="${setData?.reps??''}">
+            <input class="set-input" type="number" placeholder="${ps?.reps??'reps'}" id="ex-${i}-${s}-r" min="0">
           </div>`;
         }).join('')}
       </div>`;
-    }).join('')}
+    }).join('')}`;
 
-    <div class="field" style="margin-top:4px"><label>Notes</label>
-      <textarea id="log-notes" placeholder="How did it feel? PRs?" rows="2">${editSession?.notes??''}</textarea>
+  if (wState === 'active') _resumeTimerInterval();
+}
+
+// ── Post-workout screen ────────────────────────────────────────────────────────
+
+function renderPostWorkout(day) {
+  const el = document.getElementById('workout-day-content');
+  const mins = Math.round(wElapsedMs / 60000);
+  const secs = Math.round((wElapsedMs % 60000) / 1000);
+  const timeStr = mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
+
+  el.innerHTML = `
+    <div class="pw-header">
+      <div class="pw-check">✓</div>
+      <div class="pw-title">Session Complete</div>
+      <div class="pw-duration">${timeStr}</div>
     </div>
-    <div class="form-actions">
-      <button class="btn btn-sm" onclick="saveWorkoutLog('${day}', '${editLogId}')">
-        ${editLogId ? 'Update Session' : 'Save Session'}
-      </button>
+
+    <div class="field mb-12">
+      <label>Session Rating (1–5)</label>
+      <div class="rating-row" id="pw-rating">
+        ${[1,2,3,4,5].map(n=>`<button class="rating-btn" data-rating="${n}" onclick="selectPwRating(this,${n})">${n}</button>`).join('')}
+      </div>
+    </div>
+
+    <div class="field mb-16">
+      <label>Notes</label>
+      <textarea id="pw-notes" placeholder="PRs? How did it feel?" rows="2"></textarea>
+    </div>
+
+    <div class="section-title">Recovery</div>
+    <div id="pw-recovery">
+      ${RECOVERY_OPTS.map(opt => `
+        <button class="pw-opt-btn" id="pwrc-${opt.id}" onclick="togglePwOpt('recovery','${opt.id}')">
+          <span class="pw-opt-icon">${opt.icon}</span>
+          <div><div class="pw-opt-name">${opt.name}</div><div class="pw-opt-desc">${opt.desc}</div></div>
+          <span class="pw-opt-check" id="pwrc-chk-${opt.id}">✓</span>
+        </button>`).join('')}
+    </div>
+
+    <div class="section-title mt-16">Add Cardio?</div>
+    <div id="pw-cardio">
+      ${CARDIO_OPTS.map(opt => `
+        <button class="pw-opt-btn" id="pwcd-${opt.id}" onclick="togglePwOpt('cardio','${opt.id}')">
+          <span class="pw-opt-icon">${opt.icon}</span>
+          <div><div class="pw-opt-name">${opt.name}</div><div class="pw-opt-desc">${opt.desc}</div></div>
+          <span class="pw-opt-check" id="pwcd-chk-${opt.id}">✓</span>
+        </button>`).join('')}
+    </div>
+
+    <div class="form-actions mt-16">
+      <button class="btn" onclick="saveTimedWorkout('${day}')">Save &amp; Done</button>
+      <button class="btn btn-secondary" onclick="resetWorkout();renderWorkoutDay('${day}')">Back</button>
     </div>`;
 }
 
-async function saveWorkoutLog(day, editLogId) {
+function selectPwRating(btn, n) {
+  document.querySelectorAll('#pw-rating .rating-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function togglePwOpt(type, id) {
+  const set = type === 'recovery' ? wSelectedRecovery : wSelectedCardio;
+  const prefix = type === 'recovery' ? 'pwrc' : 'pwcd';
+  const btn = document.getElementById(`${prefix}-${id}`);
+  const chk = document.getElementById(`${prefix}-chk-${id}`);
+  if (set.has(id)) {
+    set.delete(id);
+    btn.classList.remove('selected');
+  } else {
+    set.add(id);
+    btn.classList.add('selected');
+    if (chk) chk.style.opacity = '1';
+  }
+  if (chk) chk.style.opacity = set.has(id) ? '1' : '0';
+}
+
+async function saveTimedWorkout(day) {
+  const w = WORKOUTS[day];
+  const rating = parseInt(document.querySelector('#pw-rating .rating-btn.active')?.dataset?.rating) || null;
+  const notes = document.getElementById('pw-notes')?.value ?? '';
+  const mins = Math.round(wElapsedMs / 60000);
+
+  const payload = {
+    user_id: currentUser.id,
+    date: todayStr(),
+    phase: userProfile?.current_phase ?? 1,
+    week: userProfile?.current_week ?? 1,
+    day_name: w.title,
+    exercises: wCapturedExercises ?? [],
+    session_rating: rating,
+    notes,
+    duration_minutes: mins,
+  };
+
+  const { error } = await sb.from('workout_logs').insert(payload);
+  if (error) { toast('Error: ' + error.message, 'error'); return; }
+
+  // Mark training checklist item
+  await sb.from('checklist_logs').upsert({
+    user_id: currentUser.id, date: todayStr(), item_id: 'training', item_label: 'Training session completed and logged', completed: true,
+  }, { onConflict: 'user_id,date,item_id' });
+
+  // Mark selected recovery/checklist items
+  const allSelected = [
+    ...[...wSelectedRecovery].map(id => RECOVERY_OPTS.find(o => o.id === id)).filter(Boolean),
+    ...[...wSelectedCardio].map(id => CARDIO_OPTS.find(o => o.id === id)).filter(Boolean),
+  ];
+  for (const opt of allSelected) {
+    const ckItem = CHECKLIST_ITEMS.find(i => i.id === opt.id);
+    if (ckItem) {
+      await sb.from('checklist_logs').upsert({
+        user_id: currentUser.id, date: todayStr(), item_id: ckItem.id, item_label: ckItem.label, completed: true,
+      }, { onConflict: 'user_id,date,item_id' });
+    }
+  }
+
+  toast('Session saved!', 'success');
+  resetWorkout();
+  await renderWorkoutDay(day);
+}
+
+async function saveWorkoutFromEdit(day, editLogId) {
   const w = WORKOUTS[day];
   const logged = w.exercises.map((ex, i) => ({
     name: ex.name,
-    sets: Array.from({length:ex.sets},(_,s) => ({
+    sets: Array.from({length: ex.sets}, (_, s) => ({
       weight: document.getElementById(`ex-${i}-${s}-w`)?.value ?? '',
       reps: document.getElementById(`ex-${i}-${s}-r`)?.value ?? '',
     })),
   }));
-
   const payload = {
     user_id: currentUser.id, date: todayStr(),
     phase: userProfile?.current_phase ?? 1, week: userProfile?.current_week ?? 1,
     day_name: w.title, exercises: logged,
-    whoop_recovery: document.getElementById('log-whoop')?.value || null,
     session_rating: parseInt(document.getElementById('log-rating')?.value) || null,
     notes: document.getElementById('log-notes')?.value ?? '',
   };
-
-  let error;
-  if (editLogId && editLogId !== 'null') {
-    ({ error } = await sb.from('workout_logs').update(payload).eq('id', editLogId).eq('user_id', currentUser.id));
-  } else {
-    ({ error } = await sb.from('workout_logs').insert(payload));
-  }
-
+  const { error } = await sb.from('workout_logs').update(payload).eq('id', editLogId).eq('user_id', currentUser.id);
   if (error) { toast('Error: ' + error.message, 'error'); return; }
-  await sb.from('checklist_logs').upsert({
-    user_id: currentUser.id, date: todayStr(), item_id: 'training', item_label: 'Training session completed and logged', completed: true,
-  }, { onConflict: 'user_id,date,item_id' });
-  toast(editLogId && editLogId !== 'null' ? 'Session updated!' : 'Session saved!', 'success');
-  // Refresh to show updated state
+  toast('Session updated!', 'success');
   await renderWorkoutDay(day);
 }
 
