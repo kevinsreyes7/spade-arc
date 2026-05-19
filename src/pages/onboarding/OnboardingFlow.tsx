@@ -208,10 +208,16 @@ export function OnboardingFlow() {
     )
   }
 
+  const weightKg = state.units === 'metric'
+    ? parseFloat(state.weightKg) || 80
+    : (parseFloat(state.weightKg) || 176) / 2.20462
+
   return (
     <Ready
       name={state.name}
       trainingDays={state.trainingDays}
+      weightKg={weightKg}
+      units={state.units}
       onEnter={handleEnter}
       loading={saving}
       error={saveError}

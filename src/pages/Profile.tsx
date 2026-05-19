@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { redirectToPortal } from '@/lib/stripe'
 import { supabase } from '@/lib/supabase'
+import { getPhaseFromWeek, getPhaseName } from '@/data/workouts'
 import type { Equipment, Language, UnitPreference } from '@/types'
 
 interface Stats {
@@ -21,6 +22,7 @@ interface Stats {
   heaviestSquat: number | null
   heaviestPullUp: number | null
   heaviestRDL: number | null
+  heaviestBench: number | null
 }
 
 function calculateStreaks(dates: string[]): { current: number; longest: number } {
@@ -64,6 +66,7 @@ function calculateStreaks(dates: string[]): { current: number; longest: number }
 
 const EQUIPMENT_LABELS: Record<Equipment, string> = {
   full_gym: 'Full Gym',
+  full_gym_sprint: 'Full Gym + Sprint Space',
   barbells_dumbbells: 'Barbells & Dumbbells',
   dumbbells_only: 'Dumbbells Only',
   bodyweight: 'Bodyweight Only',
@@ -75,7 +78,7 @@ export function Profile() {
   const { t } = useTranslation()
   const { user, signOut } = useAuthContext()
   const { profile, update } = useProfile()
-  const { status, trialDaysLeft, isActive } = useSubscription()
+  const { isActive } = useSubscription()
   const [editing, setEditing] = useState(false)
   const [editData, setEditData] = useState({
     name: profile?.name ?? '',
@@ -84,9 +87,15 @@ export function Profile() {
     height_cm: String(profile?.height_cm ?? ''),
   })
   const [saving, setSaving] = useState(false)
+  const [restTimerEnabled, setRestTimerEnabled] = useState(
+    () => localStorage.getItem('spade_arc_rest_timer') !== 'false'
+  )
+  const [notifPermission, setNotifPermission] = useState<NotificationPermission>(
+    () => (typeof Notification !== 'undefined' ? Notification.permission : 'default')
+  )
   const [stats, setStats] = useState<Stats>({
     totalSessions: null, currentStreak: null, longestStreak: null,
-    heaviestSquat: null, heaviestPullUp: null, heaviestRDL: null,
+    heaviestSquat: null, heaviestPullUp: null, heaviestRDL: null, heaviestBench: null,
   })
 
   const unit = profile?.unit_preference === 'imperial' ? 'lbs' : 'kg'
@@ -111,14 +120,15 @@ export function Profile() {
       const sessionIds = sessions?.map((s) => s.id) ?? []
 
       if (!sessionIds.length) {
-        setStats({ totalSessions: count ?? 0, currentStreak: current, longestStreak: longest, heaviestSquat: null, heaviestPullUp: null, heaviestRDL: null })
+        setStats({ totalSessions: count ?? 0, currentStreak: current, longestStreak: longest, heaviestSquat: null, heaviestPullUp: null, heaviestRDL: null, heaviestBench: null })
         return
       }
 
-      const [squat, pullup, rdl] = await Promise.all([
+      const [squat, pullup, rdl, bench] = await Promise.all([
         supabase.from('exercise_logs').select('weight').eq('exercise_name', 'Barbell Back Squat').eq('completed', true).not('weight', 'is', null).in('session_id', sessionIds).order('weight', { ascending: false }).limit(1),
         supabase.from('exercise_logs').select('weight').eq('exercise_name', 'Weighted Pull-Up').eq('completed', true).not('weight', 'is', null).in('session_id', sessionIds).order('weight', { ascending: false }).limit(1),
         supabase.from('exercise_logs').select('weight').eq('exercise_name', 'Romanian Deadlift').eq('completed', true).not('weight', 'is', null).in('session_id', sessionIds).order('weight', { ascending: false }).limit(1),
+        supabase.from('exercise_logs').select('weight').eq('exercise_name', 'Incline Barbell Press').eq('completed', true).not('weight', 'is', null).in('session_id', sessionIds).order('weight', { ascending: false }).limit(1),
       ])
 
       setStats({
@@ -128,6 +138,7 @@ export function Profile() {
         heaviestSquat: squat.data?.[0]?.weight ?? null,
         heaviestPullUp: pullup.data?.[0]?.weight ?? null,
         heaviestRDL: rdl.data?.[0]?.weight ?? null,
+        heaviestBench: bench.data?.[0]?.weight ?? null,
       })
     }
     loadStats()
@@ -163,6 +174,24 @@ export function Profile() {
   const handleManageSubscription = async () => {
     if (profile.stripe_customer_id) {
       await redirectToPortal(profile.stripe_customer_id)
+    }
+  }
+
+  const handleRestTimerToggle = () => {
+    const next = !restTimerEnabled
+    setRestTimerEnabled(next)
+    localStorage.setItem('spade_arc_rest_timer', next ? 'true' : 'false')
+  }
+
+  const handleRequestNotifications = async () => {
+    if (typeof Notification === 'undefined') return
+    const permission = await Notification.requestPermission()
+    setNotifPermission(permission)
+    if (permission === 'granted') {
+      new Notification('SPADE ARC', {
+        body: 'Notifications enabled. You\'ll get your daily EODR reminder.',
+        icon: '/icons/icon-192.png',
+      })
     }
   }
 
@@ -230,10 +259,62 @@ export function Profile() {
         {/* Current week */}
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06 }} className="mb-4">
           <Card>
-            <p className="text-xs text-textMuted uppercase tracking-widest mb-3">{t('profile.currentWeek')}</p>
-            <p className="text-textPrimary font-medium mb-2">
-              {t('profile.weekOf20', { week: profile.current_week })}
-            </p>
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-xs text-textMuted uppercase tracking-widest">{t('profile.currentWeek')}</p>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-mono text-accent">
+                  {getPhaseFromWeek(profile.current_week)} · {getPhaseName(getPhaseFromWeek(profile.current_week))}
+                </span>
+              </div>
+            </div>
+
+            {/* Progress bar */}
+            <div className="mb-3">
+              <div className="flex justify-between text-xs text-textMuted mb-1">
+                <span>Week {profile.current_week} of 20</span>
+                <span>{Math.round((profile.current_week / 20) * 100)}% complete</span>
+              </div>
+              <div className="h-2 bg-border rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-accent rounded-full transition-all duration-500"
+                  style={{ width: `${(profile.current_week / 20) * 100}%` }}
+                />
+              </div>
+            </div>
+
+            {/* Phase bands */}
+            <div className="flex gap-1 mb-3">
+              {[1, 2, 3, 4].map((p) => {
+                const currentPhase = getPhaseFromWeek(profile.current_week)
+                return (
+                  <div
+                    key={p}
+                    className={`flex-1 h-1.5 rounded-full ${p < currentPhase ? 'bg-accent' : p === currentPhase ? 'bg-accent/60' : 'bg-border'}`}
+                  />
+                )
+              })}
+            </div>
+
+            {/* Advance to Next Week */}
+            {profile.current_week < 20 && (
+              <button
+                onClick={() => {
+                  if (window.confirm(`Advance to Week ${profile.current_week + 1}?`)) {
+                    handleWeekChange(profile.current_week + 1)
+                  }
+                }}
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-secondary/10 border border-secondary/30 text-secondary text-sm font-medium hover:bg-secondary/20 transition-all mb-3"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4">
+                  <polyline points="13 17 18 12 13 7" />
+                  <polyline points="6 17 11 12 6 7" />
+                </svg>
+                Advance to Week {profile.current_week + 1}
+              </button>
+            )}
+
+            {/* Manual week picker */}
+            <p className="text-xs text-textMuted mb-2">Set week manually:</p>
             <div className="flex gap-1 flex-wrap">
               {WEEKS.map((w) => (
                 <button
@@ -298,11 +379,45 @@ export function Profile() {
             </div>
 
             {/* Equipment */}
-            <div className="flex items-center justify-between py-2">
+            <div className="flex items-center justify-between py-2 border-b border-border">
               <p className="text-sm text-textPrimary">{t('profile.equipment')}</p>
               <p className="text-xs text-textMuted">
                 {EQUIPMENT_LABELS[profile.equipment as Equipment] ?? profile.equipment}
               </p>
+            </div>
+
+            {/* Rest Timer */}
+            <div className="flex items-center justify-between py-2 border-b border-border">
+              <div>
+                <p className="text-sm text-textPrimary">Rest Timer</p>
+                <p className="text-xs text-textMuted">Auto-start after each set</p>
+              </div>
+              <button
+                onClick={handleRestTimerToggle}
+                className={`w-11 h-6 rounded-full transition-colors ${restTimerEnabled ? 'bg-accent' : 'bg-border'}`}
+              >
+                <span
+                  className={`block w-4 h-4 bg-white rounded-full shadow transition-transform ${restTimerEnabled ? 'translate-x-6' : 'translate-x-1'}`}
+                />
+              </button>
+            </div>
+
+            {/* Notifications */}
+            <div className="flex items-center justify-between py-2">
+              <div>
+                <p className="text-sm text-textPrimary">EODR & MA Notifications</p>
+                <p className="text-xs text-textMuted">Daily report + morning analysis reminders</p>
+              </div>
+              {notifPermission === 'granted' ? (
+                <span className="text-xs text-green-400 font-medium">Enabled</span>
+              ) : (
+                <button
+                  onClick={handleRequestNotifications}
+                  className="text-xs text-accent hover:text-accent/80 transition-colors font-medium"
+                >
+                  Enable
+                </button>
+              )}
             </div>
           </Card>
         </motion.div>
@@ -319,6 +434,7 @@ export function Profile() {
                 { label: t('profile.stats.heaviestSquat'), val: stats.heaviestSquat !== null ? `${stats.heaviestSquat}${unit}` : '—' },
                 { label: t('profile.stats.heaviestPullUp'), val: stats.heaviestPullUp !== null ? `${stats.heaviestPullUp}${unit}` : '—' },
                 { label: t('profile.stats.heaviestRDL'), val: stats.heaviestRDL !== null ? `${stats.heaviestRDL}${unit}` : '—' },
+                { label: 'Incline Bench PR', val: stats.heaviestBench !== null ? `${stats.heaviestBench}${unit}` : '—' },
               ].map((s) => (
                 <div key={s.label} className="bg-bg rounded-xl p-3">
                   <p className="font-mono text-xl text-accent">{s.val}</p>
@@ -334,13 +450,7 @@ export function Profile() {
           <Card>
             <div className="flex items-center justify-between mb-3">
               <p className="text-sm text-textPrimary">{t('profile.subscription')}</p>
-              {isActive ? (
-                <Badge variant="success">{t('profile.subscriptionActive')}</Badge>
-              ) : status === 'trial' ? (
-                <Badge variant="phase">{t('profile.subscriptionTrial')} · {trialDaysLeft}d left</Badge>
-              ) : (
-                <Badge variant="muted">{t('profile.subscriptionCancelled')}</Badge>
-              )}
+              <Badge variant="success">{t('profile.subscriptionActive')}</Badge>
             </div>
             {isActive && profile.stripe_customer_id && (
               <Button size="sm" variant="outline" onClick={handleManageSubscription}>

@@ -1,7 +1,8 @@
 export type Phase = 1 | 2 | 3 | 4
 
-export type FitnessLevel = 'beginner' | 'intermediate' | 'advanced'
-export type Equipment = 'full_gym' | 'dumbbells_only' | 'barbells_dumbbells' | 'bodyweight'
+export type FitnessLevel = 'beginner' | 'intermediate' | 'advanced' | 'elite'
+export type Equipment = 'full_gym' | 'full_gym_sprint' | 'dumbbells_only' | 'barbells_dumbbells' | 'bodyweight'
+export type SessionType = 'strength_a' | 'strength_b' | 'strength_c' | 'strength_d' | 'strength_e' | 'arms_core' | 'speed' | 'swimming' | 'jump_rope' | 'mobility' | 'rest' | 'active_recovery' | 'custom'
 export type Sex = 'male' | 'female' | 'other'
 export type UnitPreference = 'metric' | 'imperial'
 export type SubscriptionStatus = 'trial' | 'active' | 'cancelled' | 'expired'
@@ -32,6 +33,8 @@ export interface Profile {
   stripe_customer_id: string | null
   created_at: string
   onboarding_complete: boolean
+  custom_schedule: Record<string, number | null> | null
+  week_started_at: string | null
 }
 
 export interface WorkoutSession {
@@ -163,7 +166,6 @@ export interface ActiveSet {
   setNumber: number
   weight: string
   reps: string
-  feelRating: number
   notes: string
   completed: boolean
 }
@@ -190,3 +192,81 @@ export interface NutritionTargets {
   carbs: number
   fat: number
 }
+
+export interface JournalEntry {
+  id: string
+  user_id: string
+  date: string
+  energy: number | null
+  mood: number | null
+  sleep_hours: number | null
+  sleep_quality: number | null
+  stress: number | null
+  morning_weight: number | null
+  water_litres: number | null
+  protein_hit: boolean | null
+  pain_notes: string
+  one_win: string
+  one_improve: string
+  daily_intention: string
+  free_write: string
+  created_at: string
+}
+
+export interface SpeedLog {
+  id: string
+  user_id: string
+  date: string
+  week_number: number
+  phase: Phase
+  sprint_20m_times: number[]
+  sprint_60m_times: number[]
+  broad_jump_distances: number[]
+  pro_agility_times: number[]
+  t_drill_times: number[]
+  notes: string
+  completed_at: string
+}
+
+export interface SwimLog {
+  id: string
+  user_id: string
+  date: string
+  total_laps: number
+  distance_metres: number
+  duration_minutes: number
+  sets_completed: string[]
+  notes: string
+  created_at: string
+}
+
+export interface JumpRopeLog {
+  id: string
+  user_id: string
+  date: string
+  week_number: number
+  rounds_completed: number
+  total_duration_minutes: number
+  created_at: string
+}
+
+export interface ScheduledSession {
+  id: string
+  user_id: string
+  date: string
+  session_type: SessionType
+  custom_name: string | null
+  workout_day_id: number | null
+  completed: boolean
+  created_at: string
+}
+
+export interface SupplementLog {
+  id: string
+  user_id: string
+  date: string
+  supplement_id: string
+  taken: boolean
+  created_at: string
+}
+

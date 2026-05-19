@@ -20,12 +20,14 @@ const MEASUREMENT_FIELDS = [
   'quad_left', 'quad_right', 'calf_left', 'calf_right',
 ] as const
 
+// Each entry: primary English name saved in exercise_logs + legacy nameKey fallback
 const KEY_LIFTS = [
-  { key: 'Weighted Pull-Up', label: 'Pull-Up' },
-  { key: 'Barbell Back Squat', label: 'Squat' },
-  { key: 'Romanian Deadlift', label: 'RDL' },
-  { key: 'Incline Barbell Press', label: 'Incline Press' },
-  { key: 'Barbell Hip Thrust', label: 'Hip Thrust' },
+  { key: 'Weighted Pull-Up', legacy: 'workouts.day1.ex1.name', label: 'Pull-Up' },
+  { key: 'Barbell Back Squat', legacy: 'workouts.day2.ex1.name', label: 'Squat' },
+  { key: 'Romanian Deadlift', legacy: 'workouts.day4.ex1.name', label: 'Deadlift' },
+  { key: 'Incline Barbell Press', legacy: 'workouts.day3.ex1.name', label: 'Bench Press' },
+  { key: 'Barbell Hip Thrust', legacy: 'workouts.day4.ex3.name', label: 'Hip Thrust' },
+  { key: 'Seated DB Overhead Press', legacy: 'workouts.day5.ex1.name', label: 'OHP' },
 ]
 
 interface LiftData { date: string; weight: number }
@@ -77,10 +79,11 @@ export function Progress() {
       sessions.forEach((s) => { sessionDateMap[s.id] = s.date })
 
       const results = await Promise.all(KEY_LIFTS.map(async (lift) => {
+        // Query by English name OR legacy nameKey (for old data saved before translation fix)
         const { data: logs } = await supabase
           .from('exercise_logs')
           .select('weight, session_id')
-          .eq('exercise_name', lift.key)
+          .or(`exercise_name.eq.${lift.key},exercise_name.eq.${lift.legacy}`)
           .eq('completed', true)
           .not('weight', 'is', null)
           .in('session_id', sessionIds)

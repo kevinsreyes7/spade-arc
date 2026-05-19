@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { useProfile } from '@/context/ProfileContext'
+import { getWeekBounds } from '@/hooks/useWorkoutSchedule'
 import { useAuthContext } from '@/context/AuthContext'
 import { workouts, getPhaseFromWeek } from '@/data/workouts'
 import type { ActiveExercise, ActiveSet, Phase } from '@/types'
@@ -31,7 +32,6 @@ function buildActiveExercises(workoutDayId: number, phase: Phase): ActiveExercis
       setNumber: i + 1,
       weight: '',
       reps: '',
-      feelRating: 0,
       notes: '',
       completed: false,
     }))
@@ -48,7 +48,7 @@ export function Workout() {
   const navigate = useNavigate()
   const { t, i18n } = useTranslation()
   const { user } = useAuthContext()
-  const { profile } = useProfile()
+  const { profile, update: updateProfile } = useProfile()
 
   // Always resolve exercise names in English so Supabase queries are consistent
   const tEn = useMemo(() => i18n.getFixedT('en'), [i18n])
@@ -74,6 +74,9 @@ export function Workout() {
   const [showExitConfirm, setShowExitConfirm] = useState(false)
   const [isPaused, setIsPaused] = useState(false)
   const [elapsedSeconds, setElapsedSeconds] = useState(0)
+  const [aiSummary, setAiSummary] = useState<string | null>(null)
+  const [aiLoading, setAiLoading] = useState(false)
+  const restTimerEnabled = localStorage.getItem('spade_arc_rest_timer') !== 'false'
 
   // ── Previous session weights ─────────────────────────────────────────────
   const [previousSets, setPreviousSets] = useState<
@@ -259,7 +262,7 @@ export function Workout() {
       }
       return next
     })
-    if (ex && !exercises[exIndex].sets[setIndex].completed) {
+    if (ex && !exercises[exIndex].sets[setIndex].completed && restTimerEnabled) {
       setRestTimer({ visible: true, seconds: ex.restSeconds })
     }
   }, [workoutDay, exercises])
@@ -287,7 +290,7 @@ export function Workout() {
 
     let sid = sessionId
     if (!sid) {
-      const { data } = await supabase.from('workout_sessions').insert({
+      const { data, error } = await supabase.from('workout_sessions').insert({
         user_id: user.id,
         date: today,
         week_number: currentWeek,
@@ -296,29 +299,36 @@ export function Workout() {
         workout_name: workoutDay.nameKey,
         total_sets: 0,
       }).select().single()
-      if (!data) return
+      if (error || !data) {
+        alert('Could not save workout session. Check your connection and try again.')
+        return
+      }
       sid = data.id
     }
 
-    await supabase.from('workout_sessions').update({
+    const { error: updateError } = await supabase.from('workout_sessions').update({
       completed_at: new Date().toISOString(),
       duration_minutes: duration,
       total_sets: completedSets,
     }).eq('id', sid)
 
+    if (updateError) {
+      alert('Failed to mark workout complete. Check your connection.')
+      return
+    }
+
     // Store English exercise names so Progress queries work regardless of user language
     const logs = exercises.flatMap((ae, exIdx) => {
       const ex = workoutDay.exercises[exIdx]
-      const exerciseName = ae.substitutedWith
-        ? tEn(ae.substitutedWith)
-        : tEn(ex?.nameKey ?? '')
+      const exerciseName = ae.substitutedWith ? tEn(ae.substitutedWith) : tEn(ex?.nameKey ?? '')
+      const originalExerciseName = ae.substitutedWith ? tEn(ex?.nameKey ?? '') : null
       return ae.sets.map((s) => ({
         session_id: sid,
         exercise_name: exerciseName,
+        original_exercise_name: originalExerciseName,
         set_number: s.setNumber,
         weight: s.weight ? parseFloat(s.weight) : null,
         reps: s.reps ? parseInt(s.reps) : null,
-        feel_rating: s.feelRating || null,
         notes: s.notes,
         completed: s.completed,
       }))
@@ -326,7 +336,59 @@ export function Workout() {
 
     await supabase.from('exercise_logs').insert(logs)
     localStorage.removeItem(storageKey)
+
+    // Auto-advance week if all training sessions for this calendar week are done
+    if (profile && currentWeek < 20) {
+      const { start, end } = getWeekBounds()
+      const { count } = await supabase
+        .from('workout_sessions')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .not('completed_at', 'is', null)
+        .gte('date', start)
+        .lte('date', end)
+      const target = profile.training_days_per_week ?? 4
+      if (count !== null && count === target) {
+        await updateProfile({ current_week: Math.min(currentWeek + 1, 20) })
+      }
+    }
+
+    // Generate AI analysis — 10s timeout so it never blocks the flow
+    setAiLoading(true)
     setStep('cardio')
+    try {
+      const exerciseSummary = exercises.map((ae, exIdx) => {
+        const ex = workoutDay.exercises[exIdx]
+        const name = ae.substitutedWith ? tEn(ae.substitutedWith) : tEn(ex?.nameKey ?? '')
+        const doneSets = ae.sets.filter((s) => s.completed)
+        return { name, sets: doneSets.map((s) => ({ weight: s.weight, reps: s.reps })) }
+      })
+      const aiTimeout = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('timeout')), 10000)
+      )
+      const result = await Promise.race([
+        supabase.functions.invoke('ai-analysis', {
+          body: {
+            type: 'workout',
+            data: {
+              workoutName: tEn(workoutDay.nameKey),
+              exercises: exerciseSummary,
+              duration,
+              totalSets: completedSets,
+            },
+          },
+        }),
+        aiTimeout,
+      ])
+      const aiData = (result as { data?: { analysis?: string } }).data
+      if (aiData?.analysis) {
+        setAiSummary(aiData.analysis)
+        await supabase.from('workout_sessions').update({ ai_summary: aiData.analysis }).eq('id', sid)
+      }
+    } catch {
+      // AI is optional — silently skip
+    }
+    setAiLoading(false)
   }
 
   // ── Log cardio then move to summary ─────────────────────────────────────
@@ -345,12 +407,30 @@ export function Workout() {
   }
 
   const handleExit = async (save: boolean) => {
-    if (save && user && sessionId) {
-      await supabase.from('workout_sessions').update({ total_sets: completedSets }).eq('id', sessionId)
+    if (save && user && sessionId && workoutDay) {
+      const logs = exercises.flatMap((ae, exIdx) => {
+        const ex = workoutDay.exercises[exIdx]
+        const exerciseName = ae.substitutedWith ? tEn(ae.substitutedWith) : tEn(ex?.nameKey ?? '')
+        const originalExerciseName = ae.substitutedWith ? tEn(ex?.nameKey ?? '') : null
+        return ae.sets.filter((s) => s.completed).map((s) => ({
+          session_id: sessionId,
+          exercise_name: exerciseName,
+          original_exercise_name: originalExerciseName,
+          set_number: s.setNumber,
+          weight: s.weight ? parseFloat(s.weight) : null,
+          reps: s.reps ? parseInt(s.reps) : null,
+          notes: s.notes,
+          completed: true,
+        }))
+      })
+      if (logs.length > 0) await supabase.from('exercise_logs').insert(logs)
+      await supabase.from('workout_sessions').update({
+        total_sets: completedSets,
+        completed_at: new Date().toISOString(),
+      }).eq('id', sessionId)
+      localStorage.removeItem(storageKey)
     } else {
-      if (sessionId) {
-        await supabase.from('workout_sessions').delete().eq('id', sessionId)
-      }
+      if (sessionId) await supabase.from('workout_sessions').delete().eq('id', sessionId)
       localStorage.removeItem(storageKey)
     }
     navigate('/home')
@@ -433,7 +513,7 @@ export function Workout() {
   if (step === 'done') {
     const duration = Math.round(elapsedSeconds / 60)
     return (
-      <div className="min-h-screen bg-bg flex flex-col items-center justify-center px-6">
+      <div className="min-h-screen bg-bg flex flex-col items-center px-6 py-12 overflow-y-auto">
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -463,11 +543,26 @@ export function Workout() {
             </div>
           </div>
 
+          {/* AI Analysis */}
+          <div className="bg-card border border-border rounded-2xl p-4 mb-6 text-left">
+            <p className="text-xs text-accent uppercase tracking-widest mb-2">AI Generated · Workout Analysis</p>
+            {aiLoading ? (
+              <div className="flex items-center gap-2 py-2">
+                <div className="w-4 h-4 border-2 border-accent/30 border-t-accent rounded-full animate-spin" />
+                <p className="text-textMuted text-sm">Analysing your session...</p>
+              </div>
+            ) : aiSummary ? (
+              <p className="text-textPrimary text-sm leading-relaxed whitespace-pre-line">{aiSummary}</p>
+            ) : (
+              <p className="text-textMuted text-sm">Analysis unavailable — check your AI settings.</p>
+            )}
+          </div>
+
           <div className="flex flex-col gap-3">
-            <Button size="lg" fullWidth variant="secondary">
-              {t('workout.summary.sharePR')}
+            <Button size="lg" fullWidth onClick={() => navigate('/eodr')} className="font-display tracking-widest">
+              View Daily Report ♠
             </Button>
-            <Button size="lg" fullWidth onClick={() => navigate('/home')}>
+            <Button size="lg" fullWidth variant="ghost" onClick={() => navigate('/home')}>
               {t('workout.summary.backHome')}
             </Button>
           </div>

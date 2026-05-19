@@ -9,11 +9,65 @@ import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { DecompressionSheet } from '@/components/DecompressionSheet'
+import { SessionPickerSheet } from '@/components/SessionPickerSheet'
 import { getPhaseFromWeek, getPhaseName } from '@/data/workouts'
 import { dailyQuotes } from '@/data/protocols'
 import { getTodayWorkout, getNutritionTargets, buildWeekSchedule } from '@/hooks/useWorkoutSchedule'
 import { supabase } from '@/lib/supabase'
-import { MatrixRain } from '@/components/MatrixRain'
+
+// ── Morning Analysis hook ────────────────────────────────────────────────────
+
+function useMorningAnalysis(userId: string | undefined, profileName: string, currentWeek: number, todayPlan: string) {
+  const [analysis, setAnalysis] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [dismissed, setDismissed] = useState(false)
+
+  const isMorning = (() => { const h = new Date().getHours(); return h >= 6 && h < 11 })()
+  const cacheKey = `spade_arc_ma_${new Date().toISOString().split('T')[0]}`
+
+  useEffect(() => {
+    if (!userId || !isMorning || dismissed) return
+    const cached = localStorage.getItem(cacheKey)
+    if (cached) { setAnalysis(cached); return }
+
+    const generate = async () => {
+      setLoading(true)
+      try {
+        const yesterday = new Date()
+        yesterday.setDate(yesterday.getDate() - 1)
+        const { data: sessions } = await supabase
+          .from('workout_sessions')
+          .select('workout_name, total_sets, date')
+          .eq('user_id', userId)
+          .not('completed_at', 'is', null)
+          .order('date', { ascending: false })
+          .limit(3)
+
+        const recentWorkouts = (sessions ?? [])
+          .map((s) => `${s.date}: ${s.workout_name} (${s.total_sets} sets)`)
+          .join(', ') || 'No recent sessions'
+
+        const lastDate = sessions?.[0]?.date
+        const daysSinceLastWorkout = lastDate
+          ? Math.round((Date.now() - new Date(lastDate + 'T00:00:00').getTime()) / 86400000)
+          : null
+
+        const { data } = await supabase.functions.invoke('ai-analysis', {
+          body: { type: 'morning', data: { profileName, currentWeek, recentWorkouts, todayPlan, daysSinceLastWorkout } },
+        })
+        if (data?.analysis) {
+          setAnalysis(data.analysis)
+          localStorage.setItem(cacheKey, data.analysis)
+        }
+      } catch { /* AI optional */ }
+      setLoading(false)
+    }
+
+    generate()
+  }, [userId, isMorning])
+
+  return { analysis, loading, isMorning, dismissed, dismiss: () => setDismissed(true) }
+}
 
 const WEEK_ICONS = { workout: '🏋️', rest: '😴', sport: '⚽', cardio: '🏃' }
 
@@ -29,6 +83,7 @@ export function Home() {
   const [nightDone, setNightDone] = useState(false)
   const [showDecompression, setShowDecompression] = useState(false)
   const [showNightDecompression, setShowNightDecompression] = useState(false)
+  const [showSessionPicker, setShowSessionPicker] = useState(false)
   const quote = dailyQuotes[new Date().getDate() % dailyQuotes.length]
 
   const currentWeek = profile?.current_week ?? 1
@@ -67,11 +122,58 @@ export function Home() {
         setMorningDone(data.some((d) => d.type === 'morning'))
         setNightDone(data.some((d) => d.type === 'night'))
       })
+
+    // Schedule local notifications if permission granted
+    if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+      const now = new Date()
+      const timers: number[] = []
+
+      // EODR reminder at 9 PM
+      const eodrTime = new Date(); eodrTime.setHours(21, 0, 0, 0)
+      const msUntilEODR = eodrTime.getTime() - now.getTime()
+      const eodrKey = `spade_arc_eodr_notif_${today}`
+      if (msUntilEODR > 0 && !localStorage.getItem(eodrKey)) {
+        timers.push(window.setTimeout(() => {
+          new Notification('SPADE ARC — End of Day', {
+            body: 'Time to review your day. Log your EODR now.',
+            icon: '/icons/icon-192.png',
+          })
+          localStorage.setItem(eodrKey, '1')
+        }, msUntilEODR))
+      }
+
+      // Morning Analysis reminder at 7 AM
+      const maTime = new Date(); maTime.setHours(7, 0, 0, 0)
+      const msUntilMA = maTime.getTime() - now.getTime()
+      const maKey = `spade_arc_ma_notif_${today}`
+      if (msUntilMA > 0 && !localStorage.getItem(maKey)) {
+        timers.push(window.setTimeout(() => {
+          new Notification('SPADE ARC — Good Morning', {
+            body: 'Your Morning Analysis is ready. Check your daily briefing.',
+            icon: '/icons/icon-192.png',
+          })
+          localStorage.setItem(maKey, '1')
+        }, msUntilMA))
+      }
+
+      return () => timers.forEach(clearTimeout)
+    }
   }, [user, location.key])
 
   const todaySchedule = profile ? getTodayWorkout(profile, currentWeek) : null
   const isTrainingDay = todaySchedule?.type === 'workout'
   const nutrition = profile ? getNutritionTargets(profile, isTrainingDay, phase) : null
+
+  const todayPlanLabel = isTrainingDay ? 'Training day' : todaySchedule?.type === 'rest' ? 'Rest day' : 'Active recovery'
+  const ma = useMorningAnalysis(user?.id, profile?.name ?? '', currentWeek, todayPlanLabel)
+
+  const handleTodayWorkoutTap = () => {
+    if (todaySchedule?.workoutDayId != null) {
+      navigate(`/workout/${todaySchedule.workoutDayId}`)
+    } else {
+      setShowSessionPicker(true)
+    }
+  }
 
   const timeOfDay = (() => {
     const h = new Date().getHours()
@@ -84,41 +186,41 @@ export function Home() {
 
   return (
     <>
-      {/* Subtle matrix rain — fixed behind all page content at very low opacity */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: 'fixed',
-          inset: 0,
-          zIndex: 1,
-          opacity: 0.04,
-          pointerEvents: 'none',
-        }}
-      >
-        <MatrixRain />
-      </div>
-
       <Layout>
       <div className="relative z-10 px-4 pt-6 pb-4 max-w-lg mx-auto">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
           <div className="flex items-start justify-between">
-            <div>
-              <p className="text-textMuted text-sm">{dateStr}</p>
-              <h1 className="font-display text-3xl text-textPrimary tracking-wide mt-0.5">
-                {t('home.greeting', { timeOfDay, name: profile?.name ?? '' })}
-              </h1>
+            {/* Left: journal + greeting */}
+            <div className="flex items-start gap-3">
+              <button
+                onClick={() => navigate('/journal')}
+                className="mt-1 w-9 h-9 rounded-full bg-card border border-border flex items-center justify-center text-textMuted hover:text-accent transition-colors"
+                aria-label="Journal"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} className="w-5 h-5">
+                  <rect x="4" y="2" width="16" height="20" rx="2" />
+                  <path d="M8 7h8M8 11h8M8 15h5" strokeLinecap="round" />
+                </svg>
+              </button>
+              <div>
+                <p className="text-textMuted text-xs">{dateStr}</p>
+                <h1 className="font-display text-3xl text-textPrimary tracking-wide mt-0.5">
+                  {t('home.greeting', { timeOfDay, name: profile?.name ?? '' })}
+                </h1>
+              </div>
             </div>
+            {/* Right: phase badge + avatar */}
             <div className="flex items-center gap-2">
               <div className="flex flex-col items-end gap-1.5">
                 <Badge variant="phase">{getPhaseName(phase)}</Badge>
                 <span className="text-xs text-textMuted font-mono">
-                  {t('home.week', { number: currentWeek })}
+                  Wk {currentWeek} / 20
                 </span>
               </div>
               <button
                 onClick={() => navigate('/profile')}
-                className="w-9 h-9 rounded-full bg-card border border-border flex items-center justify-center text-textMuted hover:text-accent transition-colors"
+                className="w-9 h-9 rounded-full bg-secondary/20 border border-secondary/40 flex items-center justify-center text-accent hover:bg-secondary/30 transition-colors"
                 aria-label="Profile"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="w-5 h-5">
@@ -129,6 +231,37 @@ export function Home() {
             </div>
           </div>
         </motion.div>
+
+        {/* Morning Analysis */}
+        {ma.isMorning && !ma.dismissed && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-4"
+          >
+            <Card className="border-secondary/30 bg-secondary/5">
+              <div className="flex items-start justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">🌅</span>
+                  <p className="text-xs text-secondary uppercase tracking-widest font-medium">Morning Analysis</p>
+                </div>
+                <button onClick={ma.dismiss} className="text-textMuted/60 hover:text-textMuted transition-colors -mt-0.5">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth={1.8} className="w-4 h-4">
+                    <path d="M4 4l8 8M12 4l-8 8" />
+                  </svg>
+                </button>
+              </div>
+              {ma.loading ? (
+                <div className="flex items-center gap-2 py-1">
+                  <div className="w-3.5 h-3.5 border-2 border-secondary/30 border-t-secondary rounded-full animate-spin" />
+                  <p className="text-textMuted text-xs">Generating your briefing...</p>
+                </div>
+              ) : ma.analysis ? (
+                <p className="text-textPrimary text-sm leading-relaxed whitespace-pre-line">{ma.analysis}</p>
+              ) : null}
+            </Card>
+          </motion.div>
+        )}
 
         {/* Streak + Today row */}
         <div className="grid grid-cols-3 gap-3 mb-4">
@@ -202,33 +335,34 @@ export function Home() {
           transition={{ delay: 0.15 }}
           className="mb-4"
         >
-          {todaySchedule?.type === 'workout' && todaySchedule.workoutDayId ? (
+          {todaySchedule?.type === 'workout' ? (
             <Card
               hover
               glow
-              onClick={() => navigate(`/workout/${todaySchedule.workoutDayId}`)}
+              onClick={handleTodayWorkoutTap}
               className="relative overflow-hidden"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-secondary/10 to-transparent pointer-events-none" />
               <div className="relative">
                 <div className="flex items-center justify-between mb-2">
                   <Badge variant="phase">{t('home.todayWorkout')}</Badge>
-                  <span className="text-xs text-textMuted">{t('home.tapToStart')}</span>
-                </div>
-                <h2 className="font-display text-3xl text-accent tracking-wide">
-                  {t(todaySchedule.workoutNameKey ?? '')}
-                </h2>
-                <div className="mt-3 flex items-center gap-2">
-                  <span className="flex items-center gap-1 text-xs text-textMuted">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4">
-                      <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
-                    </svg>
-                    {phase <= 2 ? '60–75 min' : '70–85 min'}
+                  <span className="text-xs text-textMuted">
+                    {todaySchedule.workoutDayId != null ? 'Assigned' : 'Tap to choose'}
                   </span>
                 </div>
+                <h2 className="font-display text-3xl text-accent tracking-wide">
+                  {todaySchedule.workoutDayId != null && todaySchedule.workoutNameKey
+                    ? t(todaySchedule.workoutNameKey)
+                    : 'Ready to Train'}
+                </h2>
+                <p className="text-sm text-textMuted mt-1">
+                  {todaySchedule.workoutDayId != null
+                    ? 'Tap to start your assigned workout.'
+                    : 'Pick the session that fits your day.'}
+                </p>
               </div>
               <Button size="md" fullWidth className="mt-4 font-display tracking-widest text-lg">
-                {t('home.startWorkout')}
+                {todaySchedule.workoutDayId != null ? 'Start Workout ♠' : 'Choose Session'}
               </Button>
             </Card>
           ) : (
@@ -265,7 +399,11 @@ export function Home() {
               {buildWeekSchedule(profile, currentWeek).map((day, i, arr) => (
                 <div
                   key={day.dayOfWeek}
-                  onClick={() => day.type === 'workout' && day.workoutDayId && navigate(`/workout/${day.workoutDayId}`)}
+                  onClick={() => {
+                    if (day.type !== 'workout') return
+                    if (day.workoutDayId != null) navigate(`/workout/${day.workoutDayId}`)
+                    else setShowSessionPicker(true)
+                  }}
                   className={`flex items-center gap-3 px-4 py-2.5 transition-colors duration-150 ${
                     i < arr.length - 1 ? 'border-b border-border' : ''
                   } ${day.type === 'workout' ? 'cursor-pointer hover:bg-secondary/5' : ''} ${
@@ -278,7 +416,7 @@ export function Home() {
                   <span className="text-base">{WEEK_ICONS[day.type]}</span>
                   <span className={`text-sm flex-1 ${day.isToday ? 'text-accent' : 'text-textMuted'}`}>
                     {day.type === 'workout'
-                      ? t(day.workoutNameKey ?? '')
+                      ? day.workoutNameKey ? t(day.workoutNameKey) : 'Training'
                       : day.type === 'sport'
                         ? `Sport · ${profile.sport_name || ''}`
                         : day.type === 'cardio'
@@ -392,6 +530,31 @@ export function Home() {
           </motion.div>
         )}
 
+        {/* Community shortcut */}
+        <motion.div
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.28 }}
+          className="mb-4"
+        >
+          <button
+            onClick={() => navigate('/community')}
+            className="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-card border border-border hover:border-accent/40 hover:bg-accent/5 transition-all duration-200 group"
+          >
+            <div className="flex items-center gap-2.5">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="w-4 h-4 text-accent/70">
+                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
+              </svg>
+              <span className="text-sm text-textMuted group-hover:text-textPrimary transition-colors">Leaderboard &amp; PR Feed</span>
+            </div>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4 text-textMuted/40 group-hover:text-accent/60 transition-colors">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </button>
+        </motion.div>
+
         {/* Daily quote */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -419,6 +582,11 @@ export function Home() {
         type="night"
         onClose={() => setShowNightDecompression(false)}
         onComplete={() => setNightDone(true)}
+      />
+      <SessionPickerSheet
+        visible={showSessionPicker}
+        currentWeek={currentWeek}
+        onClose={() => setShowSessionPicker(false)}
       />
     </Layout>
     </>

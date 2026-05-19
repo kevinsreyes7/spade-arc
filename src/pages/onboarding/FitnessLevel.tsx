@@ -8,6 +8,7 @@ const LEVELS: { id: FitnessLevelType; icon: string; titleKey: string; descKey: s
   { id: 'beginner', icon: '🌱', titleKey: 'onboarding.level.beginner', descKey: 'onboarding.level.beginnerDesc', color: 'phase-1' },
   { id: 'intermediate', icon: '🔥', titleKey: 'onboarding.level.intermediate', descKey: 'onboarding.level.intermediateDesc', color: 'phase-2' },
   { id: 'advanced', icon: '⚡', titleKey: 'onboarding.level.advanced', descKey: 'onboarding.level.advancedDesc', color: 'phase-3' },
+  { id: 'elite', icon: '♠', titleKey: 'onboarding.level.elite', descKey: 'onboarding.level.eliteDesc', color: 'phase-3' },
 ]
 
 interface FitnessLevelProps {

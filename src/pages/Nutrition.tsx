@@ -37,11 +37,14 @@ function carbCyclingMacros(calories: number, proteinPct: number, carbPct: number
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const SUPPLEMENTS = [
-  { key: 'creatine', label: 'Creatine Monohydrate 5g', timing: '' },
-  { key: 'whey', label: 'Whey Protein', timing: '' },
-  { key: 'vitamin_d', label: 'Vitamin D3 + K2', timing: '' },
-  { key: 'magnesium', label: 'Magnesium Glycinate 400mg', timing: 'Take at night' },
-  { key: 'omega3', label: 'Omega-3 2–3g', timing: '' },
+  { key: 'creatine', label: 'Creatine Monohydrate', dose: '5g', timing: '' },
+  { key: 'whey', label: 'Whey Protein', dose: '', timing: '' },
+  { key: 'vitamin_d', label: 'Vitamin D3 + K2', dose: '5000IU', timing: '' },
+  { key: 'magnesium', label: 'Magnesium Glycinate', dose: '400mg', timing: 'At night' },
+  { key: 'omega3', label: 'Omega-3', dose: '2–3g', timing: '' },
+  { key: 'zinc', label: 'Zinc', dose: '30mg', timing: '' },
+  { key: 'ashwagandha', label: 'Ashwagandha KSM-66', dose: '600mg', timing: '' },
+  { key: 'collagen', label: 'Collagen + Vitamin C', dose: '', timing: '30 min pre-training' },
 ]
 
 const MEAL_PLANS = {
@@ -516,7 +519,7 @@ export function Nutrition() {
                   </div>
                   <div className="flex-1 text-left">
                     <p className={`text-sm font-medium transition-colors duration-200 ${isTaken ? 'text-success' : 'text-textPrimary'}`}>
-                      {supp.label}
+                      {supp.label}{supp.dose ? ` — ${supp.dose}` : ''}
                     </p>
                     {supp.timing && <p className="text-textMuted text-xs mt-0.5">{supp.timing}</p>}
                   </div>

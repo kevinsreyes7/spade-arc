@@ -6,8 +6,8 @@ import type { Equipment } from '@/types'
 
 const OPTIONS: { id: Equipment; icon: string; titleKey: string; descKey: string }[] = [
   { id: 'full_gym', icon: '🏋️', titleKey: 'onboarding.gym.fullGym', descKey: 'onboarding.gym.fullGymDesc' },
+  { id: 'full_gym_sprint', icon: '⚡', titleKey: 'onboarding.gym.fullGymSprint', descKey: 'onboarding.gym.fullGymSprintDesc' },
   { id: 'barbells_dumbbells', icon: '🔩', titleKey: 'onboarding.gym.barbellsDumbbells', descKey: 'onboarding.gym.barbellsDumbbellsDesc' },
-  { id: 'dumbbells_only', icon: '💪', titleKey: 'onboarding.gym.dumbbells', descKey: 'onboarding.gym.dumbbellsDesc' },
   { id: 'bodyweight', icon: '🧘', titleKey: 'onboarding.gym.bodyweight', descKey: 'onboarding.gym.bodyweightDesc' },
 ]
 

@@ -4,12 +4,12 @@ import { OnboardingLayout } from './OnboardingLayout'
 import { Button } from '@/components/ui/Button'
 
 const GOALS = [
+  { id: 'cheetah', icon: '⚡', titleKey: 'onboarding.goals.cheetah', descKey: 'onboarding.goals.cheetahDesc' },
+  { id: 'lion', icon: '🦁', titleKey: 'onboarding.goals.lion', descKey: 'onboarding.goals.lionDesc' },
   { id: 'posture', icon: '🧍', titleKey: 'onboarding.goals.posture', descKey: 'onboarding.goals.postureDesc' },
-  { id: 'back', icon: '🔱', titleKey: 'onboarding.goals.back', descKey: 'onboarding.goals.backDesc' },
-  { id: 'sixpack', icon: '⚡', titleKey: 'onboarding.goals.sixpack', descKey: 'onboarding.goals.sixpackDesc' },
-  { id: 'waist', icon: '〰️', titleKey: 'onboarding.goals.waist', descKey: 'onboarding.goals.waistDesc' },
-  { id: 'arms', icon: '💪', titleKey: 'onboarding.goals.arms', descKey: 'onboarding.goals.armsDesc' },
+  { id: 'vtaper', icon: '◆', titleKey: 'onboarding.goals.vtaper', descKey: 'onboarding.goals.vtaperDesc' },
   { id: 'legs', icon: '🦵', titleKey: 'onboarding.goals.legs', descKey: 'onboarding.goals.legsDesc' },
+  { id: 'recovery', icon: '🌙', titleKey: 'onboarding.goals.recovery', descKey: 'onboarding.goals.recoveryDesc' },
 ]
 
 interface GoalsProps {
@@ -37,13 +37,13 @@ export function Goals({ selected, onChange, onNext, onBack }: GoalsProps) {
           <h1 className="font-display text-4xl text-textPrimary tracking-wide mb-1">
             {t('onboarding.goals.title')}
           </h1>
-          <p className="text-textMuted text-sm">Choose your goals. Select as many as you want.</p>
+          <p className="text-textMuted text-sm">Choose up to 3. Your program adapts around these.</p>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           {GOALS.map((goal, i) => {
             const isSelected = selected.includes(goal.id)
-            const isDisabled = false
+            const isDisabled = !isSelected && selected.length >= 3
 
             return (
               <motion.button
